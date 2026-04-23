@@ -4,7 +4,7 @@ using System.Text;
 
 namespace RDHub.Domain.Exceptions;
 
-internal class InvalidTxIdException : Exception
+internal class InvalidTxIdException : DomainException
 {
     public InvalidTxIdException(string message) : base(message)
     {
