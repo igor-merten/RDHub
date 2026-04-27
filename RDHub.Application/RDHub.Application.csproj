@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\RDHub.Domain\RDHub.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

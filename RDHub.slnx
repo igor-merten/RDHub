@@ -1,1 +1,6 @@
-<Solution />
+<Solution>
+  <Project Path="RDHub.API/RDHub.API.csproj" />
+  <Project Path="RDHub.Application/RDHub.Application.csproj" />
+  <Project Path="RDHub.Domain/RDHub.Domain.csproj" />
+  <Project Path="RDHub.Infrastructure/RDHub.Infrastructure.csproj" />
+</Solution>
