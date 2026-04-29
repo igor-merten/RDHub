@@ -1,10 +1,12 @@
 ﻿using RDHub.Domain.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 
 namespace RDHub.Domain.ValueObjects;
 
+// representa um valor monetário em BRL com precisão decimal
 public sealed record Money
 {
     public decimal Value { get;  }

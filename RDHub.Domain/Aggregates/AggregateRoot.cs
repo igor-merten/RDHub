@@ -4,6 +4,7 @@ using System.Text;
 
 namespace RDHub.Domain.Aggregates;
 
+// Classe base para todos os aggregates: fornece Id e mecanismo de eventos
 public abstract class AggregateRoot<TId>
 {
     public TId Id { get; protected set; } = default!;

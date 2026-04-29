@@ -3,6 +3,7 @@ using RDHub.Domain.ValueObjects;
 
 namespace RDHub.Domain.Repositories;
 
+// interface para buscar e salvar cobranças Pix
 public interface IPixChargeRepository
 {
     Task<PixCharge?> GetByIdAsync(TxId txId, CancellationToken ct = default);

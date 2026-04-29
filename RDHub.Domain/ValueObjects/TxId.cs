@@ -5,6 +5,7 @@ using System.Text;
 
 namespace RDHub.Domain.ValueObjects;
 
+// dentificador unico de cobrança Pix seguindo padrão BACEN
 public sealed record TxId
 {
     public string Value { get; }

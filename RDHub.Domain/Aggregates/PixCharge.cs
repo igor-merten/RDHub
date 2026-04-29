@@ -6,6 +6,7 @@ using System.Text;
 
 namespace RDHub.Domain.Aggregates;
 
+// representa a cobrança gerada no banco com o QR Code
 public class PixCharge : AggregateRoot<Guid>
 {
     public TxId TxId { get; private set; } = null!;

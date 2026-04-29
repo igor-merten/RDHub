@@ -6,6 +6,7 @@ using System.Text;
 
 namespace RDHub.Domain.Aggregates;
 
+// representa a intenção de cobrança criada pela Receba Digital
 public class Invoice : AggregateRoot<Guid>
 {
     public Money Amount { get; private set; } = null!;

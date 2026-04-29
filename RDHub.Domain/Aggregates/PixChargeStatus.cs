@@ -4,6 +4,7 @@ using System.Text;
 
 namespace RDHub.Domain.Aggregates;
 
+// Estados de uma cobrança Pix
 public enum PixChargeStatus
 {
     Active,
