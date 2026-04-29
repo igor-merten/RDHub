@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using RDHub.Application.Interfaces;
+using RDHub.Domain.Aggregates;
 using RDHub.Domain.Repositories;
 using RDHub.Domain.ValueObjects;
 using System;
@@ -11,24 +12,27 @@ namespace RDHub.Application.Commands.ConfirmPayment;
 // organiza confirmação de pagamento: consulta o banco, atualiza dominio e notifica via fila
 public sealed class ConfirmPaymentHandler : IRequestHandler<ConfirmPaymentCommand, ConfirmPaymentResult>
 {
-    private readonly IBankAdapterFactory _adapterFactory;
-    private readonly IInvoiceRepository _invoiceRepository;
-    private readonly IUnitOfWork _unitOfWork;
     private readonly IPixChargeRepository _pixChargeRepository;
+    private readonly IInvoiceRepository _invoiceRepository;
+    private readonly IBankAdapterFactory _adapterFactory;
     private readonly IMessageQueue _messageQueue;
+    private readonly IAuditRepository _auditRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
     public ConfirmPaymentHandler(
-        IBankAdapterFactory adapterFactory,
-        IInvoiceRepository invoiceRepository,
-        IUnitOfWork unitOfWork,
         IPixChargeRepository pixChargeRepository,
-        IMessageQueue messageQueue)
+        IInvoiceRepository invoiceRepository,
+        IBankAdapterFactory adapterFactory,
+        IMessageQueue messageQueue,
+        IAuditRepository auditRepository,
+        IUnitOfWork unitOfWork)
     {
-        _adapterFactory = adapterFactory;
-        _invoiceRepository = invoiceRepository;
-        _unitOfWork = unitOfWork;
         _pixChargeRepository = pixChargeRepository;
+        _invoiceRepository = invoiceRepository;
+        _adapterFactory = adapterFactory;
         _messageQueue = messageQueue;
+        _auditRepository = auditRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<ConfirmPaymentResult> Handle(ConfirmPaymentCommand cmd, CancellationToken ct)
@@ -57,6 +61,12 @@ public sealed class ConfirmPaymentHandler : IRequestHandler<ConfirmPaymentComman
         // confirma pagamento no dominio
         pixCharge.ConfirmPayment(bankStatus.PaidAmount ?? 0, bankStatus.PaidAt ?? DateTime.UtcNow);
         invoice.MarkAsPaid(bankStatus.PaidAt ?? DateTime.UtcNow, Domain.ValueObjects.Money.BRL(bankStatus.PaidAmount ?? 0));
+
+        // registra auditoria
+        await _auditRepository.AddAsync(Audit.Create(
+            action: "Pagamento confirmado",
+            details: $"TxId={cmd.TxId}, Valor={bankStatus.PaidAmount}",
+            userId: invoice.UserId), ct);
 
         // persiste invoice e pix charge juntos
         await _pixChargeRepository.UpdateAsync(pixCharge, ct);

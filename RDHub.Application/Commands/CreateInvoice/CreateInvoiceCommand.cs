@@ -7,9 +7,8 @@ namespace RDHub.Application.Commands.CreateInvoice;
 
 // Representa a intenção de criar uma nova fatura
 public sealed record CreateInvoiceCommand(
-    decimal Amount,
-    string BankId,
-    string PixKey) : IRequest<CreateInvoiceResult>;
+    Guid UserId,
+    decimal Amount) : IRequest<CreateInvoiceResult>;
 
 // Resultado retornado após a fatura ser criada
 public sealed record CreateInvoiceResult(

@@ -15,43 +15,59 @@ public sealed class CreateInvoiceHandler : IRequestHandler<CreateInvoiceCommand,
 {
     private readonly IInvoiceRepository _invoiceRepository;
     private readonly IBankAdapterFactory _adapterFactory;
+    private readonly IUserRepository _userRepository;
+    private readonly IAuditRepository _auditRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPixChargeRepository _pixChargeRepository;
 
     public CreateInvoiceHandler(
         IInvoiceRepository invoiceRepository,
+        IPixChargeRepository pixChargeRepository,
+        IUserRepository userRepository,
         IBankAdapterFactory adapterFactory,
-        IUnitOfWork unitOfWork,
-        IPixChargeRepository pixChargeRepository)
+        IAuditRepository auditRepository,
+        IUnitOfWork unitOfWork)
     {
         _invoiceRepository = invoiceRepository;
-        _adapterFactory = adapterFactory;
-        _unitOfWork = unitOfWork;
         _pixChargeRepository = pixChargeRepository;
+        _userRepository = userRepository;
+        _adapterFactory = adapterFactory;
+        _auditRepository = auditRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<CreateInvoiceResult> Handle(CreateInvoiceCommand cmd, CancellationToken ct)
     {
+        // busca usuario para obter BankId e PixKey
+        var user = await _userRepository.GetByIdAsync(cmd.UserId, ct)
+            ?? throw new Exception("Usuário não encontrado");
+
         // cria invoice no domínio
-        var invoice = Invoice.Create(Money.BRL(cmd.Amount), cmd.BankId);
+        var invoice = Invoice.Create(cmd.UserId, Money.BRL(cmd.Amount), user.BankId);
 
         // gera TxId único
         var txId = TxId.Generate();
 
         // obtem adapter do banco correto
-        var adapter = _adapterFactory.Get(cmd.BankId);
+        var adapter = _adapterFactory.Get(user.BankId);
 
         // cria cobrança 
         var bankResponse = await adapter.CreateChargeAsync(new BankChargeRequest(
             TxId: txId.Value,
             Amount: cmd.Amount,
-            PixKey: cmd.PixKey), ct);
+            PixKey: user.PixKey), ct);
 
         // cria pix charge com o qr code retornado pelo banco
-        var pixCharge = PixCharge.Create(txId: txId, invoiceId: invoice.Id, cmd.BankId, emv: bankResponse.Emv);
+        var pixCharge = PixCharge.Create(txId, invoice.Id, user.BankId, bankResponse.Emv);
 
         // associa txid à invoice
         invoice.AssignTxId(txId);
+
+        // registra auditoria
+        await _auditRepository.AddAsync(Audit.Create(
+            action: "Invoice criada",
+            details: $"UserId={cmd.UserId}, Valor={cmd.Amount}, BankId={user.BankId}",
+            userId: cmd.UserId), ct);
 
         //persiste invoice e pix charge juntos
         await _invoiceRepository.AddAsync(invoice, ct);
