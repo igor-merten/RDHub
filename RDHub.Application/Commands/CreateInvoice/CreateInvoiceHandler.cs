@@ -10,6 +10,7 @@ using System.Text;
 
 namespace RDHub.Application.Commands.CreateInvoice;
 
+// organiza criação de fatura e cobrança no banco
 public sealed class CreateInvoiceHandler : IRequestHandler<CreateInvoiceCommand, CreateInvoiceResult>
 {
     private readonly IInvoiceRepository _invoiceRepository;
