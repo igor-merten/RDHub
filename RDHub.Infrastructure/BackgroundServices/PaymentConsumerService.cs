@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
@@ -11,35 +12,26 @@ namespace RDHub.Infrastructure.BackgroundServices;
 public class PaymentConsumerService : BackgroundService
 {
     private readonly ILogger<PaymentConsumerService> _logger;
-    private readonly HttpClient _http;
-    private readonly string _hostName;
-    private readonly string _userName;
-    private readonly string _password;
-    private readonly string _recebDigitalUrl;
+    private readonly IConfiguration _configuration;
+    private readonly IHttpClientFactory _httpClientFactory;
 
     public PaymentConsumerService(
         ILogger<PaymentConsumerService> logger,
-        HttpClient http,
-        string hostName,
-        string userName,
-        string password,
-        string recebDigitalUrl)
+        IConfiguration configuration,
+        IHttpClientFactory httpClientFactory)
     {
         _logger = logger;
-        _http = http;
-        _hostName = hostName;
-        _userName = userName;
-        _password = password;
-        _recebDigitalUrl = recebDigitalUrl;
+        _configuration = configuration;
+        _httpClientFactory = httpClientFactory;
     }
 
     protected override async Task ExecuteAsync(CancellationToken ct)
     {
         var factory = new ConnectionFactory
         {
-            HostName = _hostName,
-            UserName = _userName,
-            Password = _password
+            HostName = _configuration["RabbitMQ:HostName"]!,
+            UserName = _configuration["RabbitMQ:UserName"]!,
+            Password = _configuration["RabbitMQ:Password"]!
         };
 
         var connection = await factory.CreateConnectionAsync(ct);
@@ -62,11 +54,11 @@ public class PaymentConsumerService : BackgroundService
 
             try
             {
-                // Avisa a Receba Digital
+                var http = _httpClientFactory.CreateClient();
                 var content = new StringContent(body, Encoding.UTF8, "application/json");
-                await _http.PostAsync($"{_recebDigitalUrl}/payments/confirmed", content, ct);
+                var recebDigitalUrl = _configuration["RecebDigital:BaseUrl"]!;
+                await http.PostAsync($"{recebDigitalUrl}/payments/confirmed", content, ct);
 
-                // Confirma que a mensagem foi processada
                 await channel.BasicAckAsync(ea.DeliveryTag, false, ct);
             }
             catch (Exception ex)
@@ -82,7 +74,6 @@ public class PaymentConsumerService : BackgroundService
             consumer: consumer,
             cancellationToken: ct);
 
-        // Mantém o serviço rodando
         await Task.Delay(Timeout.Infinite, ct);
     }
 }
