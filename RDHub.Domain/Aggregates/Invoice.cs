@@ -42,7 +42,7 @@ public class Invoice : AggregateRoot<Guid>
 
     public void AssignTxId(TxId txId)
     {
-        if (txId is not null)
+        if (TxId is not null)
             throw new DomainException("Fatura já possui TxId associado");
 
         TxId = txId;

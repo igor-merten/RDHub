@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "RDHub.Domain": {
+      "commandName": "Project"
+    }
+  }
+}

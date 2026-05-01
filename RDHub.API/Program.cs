@@ -54,7 +54,7 @@ builder.Services.AddSingleton<IMessageQueue>(sp =>
 
 // ====== BACKGROUND SERVICES ======
 builder.Services.AddHostedService<PaymentConsumerService>();
-builder.Services.AddHostedService<PaymentSchedulerService>();
+//builder.Services.AddHostedService<PaymentSchedulerService>();
 
 var app = builder.Build();
 

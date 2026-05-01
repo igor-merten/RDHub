@@ -32,7 +32,12 @@ public sealed record TxId
     {
         var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
         var random = Guid.NewGuid().ToString("N")[..10].ToUpper();
-        var value = $"RDH{timestamp}{random}"[..35];
+        var value = $"RDH{timestamp}{random}";
+
+        // Garante máximo 35 caracteres sem estourar
+        if (value.Length > 35)
+            value = value[..35];
+
         return new TxId(value);
     }
 
