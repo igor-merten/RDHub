@@ -1,0 +1,17 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/pix/.*"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "status": "Paid",
+      "paidAmount": 10.0,
+      "paidAt": "2024-01-01T10:00:00Z"
+    }
+  }
+}

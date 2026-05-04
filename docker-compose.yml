@@ -1,0 +1,51 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: rdhub-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: db_rdhub
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rdhub-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mockserver:
+    image: wiremock/wiremock:latest
+    container_name: rdhub-mockserver
+    restart: unless-stopped
+    volumes:
+      - ./mockserver/mappings:/home/wiremock/mappings:ro
+    ports:
+      - "1080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/__admin || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
