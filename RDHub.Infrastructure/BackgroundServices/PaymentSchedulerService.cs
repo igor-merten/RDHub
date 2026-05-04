@@ -1,8 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RDHub.Application.Commands.ConfirmPayment;
-using MediatR;
+using RDHub.Application.Queries.GetChargeStatus;
 using RDHub.Domain.Repositories;
 
 namespace RDHub.Infrastructure.BackgroundServices;
@@ -47,13 +48,14 @@ public class PaymentSchedulerService : BackgroundService
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
         var auditRepository = scope.ServiceProvider.GetRequiredService<IAuditRepository>();
 
-        // Busca todas as auditorias com status Active
-        var activeCharges = await auditRepository.GetAllOpenAsync(ct);
+        // Busca todas as auditorias com status Open
+        var openCharges = await auditRepository.GetAllOpenAsync(ct);
 
-        foreach (var audit in activeCharges)
+        foreach (var audit in openCharges)
         {
             _logger.LogInformation("Verificando cobrança: TxId={TxId}", audit.TxId);
-            await mediator.Send(new ConfirmPaymentCommand(audit.TxId!), ct);
+            var result = await mediator.Send(new GetChargeStatusQuery(audit.TxId!), ct);
+            _logger.LogInformation("Status da cobrança {TxId}: {Status}", audit.TxId, result.Status);
         }
     }
 }
