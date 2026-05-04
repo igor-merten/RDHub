@@ -17,6 +17,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHttpClient("RecebDigital", client =>
+    client.BaseAddress = new Uri(builder.Configuration["RecebaDigital:BaseUrl"]!));
 
 // ====== MEDIATR ======
 builder.Services.AddMediatR(cfg =>
@@ -27,10 +29,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // ====== REPOSITORIES ======
-builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
-builder.Services.AddScoped<IPixChargeRepository, PixChargeRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IBankRepository, BankRepository>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ISecretRepository, SecretRepository>();
 builder.Services.AddScoped<IAuditRepository, AuditRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -41,7 +40,8 @@ builder.Services.AddHttpClient<MockBankAdapter>(client =>
 builder.Services.AddSingleton<IBankPixAdapter>(sp =>
 {
     var http = sp.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(MockBankAdapter));
-    return new MockBankAdapter(http, "MOCK1");
+    var bankId = builder.Configuration["BankAdapters:MockBankId"]!;
+    return new MockBankAdapter(http, bankId);
 });
 builder.Services.AddSingleton<IBankAdapterFactory, BankAdapterFactory>();
 
@@ -54,7 +54,7 @@ builder.Services.AddSingleton<IMessageQueue>(sp =>
 
 // ====== BACKGROUND SERVICES ======
 builder.Services.AddHostedService<PaymentConsumerService>();
-//builder.Services.AddHostedService<PaymentSchedulerService>();
+builder.Services.AddHostedService<PaymentSchedulerService>();
 
 var app = builder.Build();
 

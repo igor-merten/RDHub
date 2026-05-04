@@ -45,15 +45,15 @@ public class PaymentSchedulerService : BackgroundService
     {
         using var scope = _serviceProvider.CreateScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        var pixChargeRepository = scope.ServiceProvider.GetRequiredService<IPixChargeRepository>();
+        var auditRepository = scope.ServiceProvider.GetRequiredService<IAuditRepository>();
 
-        // Busca todas as cobranças ativas
-        var activeCharges = await pixChargeRepository.GetAllActiveAsync(ct);
+        // Busca todas as auditorias com status Active
+        var activeCharges = await auditRepository.GetAllOpenAsync(ct);
 
-        foreach (var charge in activeCharges)
+        foreach (var audit in activeCharges)
         {
-            _logger.LogInformation("Verificando cobrança: TxId={TxId}", charge.TxId.Value);
-            await mediator.Send(new ConfirmPaymentCommand(charge.TxId.Value), ct);
+            _logger.LogInformation("Verificando cobrança: TxId={TxId}", audit.TxId);
+            await mediator.Send(new ConfirmPaymentCommand(audit.TxId!), ct);
         }
     }
 }

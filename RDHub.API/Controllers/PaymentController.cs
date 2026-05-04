@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using RDHub.Application.Commands.ConfirmPayment;
 using RDHub.Application.Commands.CreateInvoice;
+using RDHub.Application.Queries.GetChargeStatus;
 
 namespace RDHub.API.Controllers;
 
@@ -43,7 +44,7 @@ public class PaymentController : ControllerBase
         [FromRoute] string txId,
         CancellationToken ct)
     {
-        var result = await _mediator.Send(new ConfirmPaymentCommand(txId), ct);
+        var result = await _mediator.Send(new GetChargeStatusQuery(txId), ct);
         return Ok(result);
     }
 }

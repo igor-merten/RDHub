@@ -1,11 +1,12 @@
-﻿using System.Text.Json;
-using RDHub.Application.DTOs;
+﻿using RDHub.Application.DTOs;
+using RDHub.Application.Interfaces;
 using RDHub.Infrastructure.BankAdapters.Abstractions;
+using System.Text.Json;
 
 namespace RDHub.Infrastructure.BankAdapters;
 
 // adapter que se comunica com o MockServer simulando um banco real
-public class MockBankAdapter : BaseBankPixAdapter
+public class MockBankAdapter : IBankPixAdapter
 {
     private readonly HttpClient _http;
     private readonly string _bankId;
@@ -16,9 +17,9 @@ public class MockBankAdapter : BaseBankPixAdapter
         _bankId = bankId;
     }
 
-    public override string BankId => _bankId;
+    public string BankId => _bankId;
 
-    public override async Task<BankChargeResponse> CreateChargeAsync(
+    public async Task<BankChargeResponse> CreateChargeAsync(
         BankChargeRequest request,
         CancellationToken ct = default)
     {
@@ -46,7 +47,7 @@ public class MockBankAdapter : BaseBankPixAdapter
             Emv: result.GetProperty("emv").GetString() ?? string.Empty);
     }
 
-    public override async Task<BankChargeStatusResponse> GetChargeStatusAsync(
+    public async Task<BankChargeStatusResponse> GetChargeStatusAsync(
         string txId,
         CancellationToken ct = default)
     {

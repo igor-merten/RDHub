@@ -9,9 +9,8 @@ namespace RDHub.Domain.Aggregates;
 // representa a intenção de cobrança criada pela Receba Digital
 public class Invoice : AggregateRoot<Guid>
 {
-    public Guid UserId { get; private set; }
+    public Guid AccountId { get; private set; }
     public Money Amount { get; private set; } = null!;
-    public string BankId { get; private set; } = null!;
     public InvoiceStatus Status { get; private set; }
     public TxId? TxId { get; private set; }
     public DateTime CreatedAt { get; private set; }
@@ -19,20 +18,16 @@ public class Invoice : AggregateRoot<Guid>
 
     private Invoice() { }
 
-    public static Invoice Create(Guid userId, Money amount, string bankId)
+    public static Invoice Create(Guid accountId, Money amount)
     {
-        if (userId == Guid.Empty)
-            throw new DomainException("UserId é obrigatório");
-
-        if (string.IsNullOrEmpty(bankId))
-            throw new DomainException("O banco deve ser informado.");
+        if (accountId == Guid.Empty)
+            throw new DomainException("AccountId é obrigatório");
 
         var invoice = new Invoice
         {
             Id = Guid.NewGuid(),
-            UserId = userId,
+            AccountId = accountId,
             Amount = amount,
-            BankId = bankId,
             Status = InvoiceStatus.Open,
             CreatedAt = DateTime.UtcNow
         };

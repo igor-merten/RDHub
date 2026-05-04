@@ -4,7 +4,7 @@ using RDHub.Domain.Repositories;
 
 namespace RDHub.Infrastructure.Persistence.Repositories;
 
-// implementacao do repositório de credenciais 
+// Implementação concreta do repositório de credenciais usando EF Core
 public class SecretRepository : ISecretRepository
 {
     private readonly AppDbContext _context;
@@ -14,8 +14,8 @@ public class SecretRepository : ISecretRepository
         _context = context;
     }
 
-    public async Task<Secret?> GetByBankIdAsync(Guid bankId, CancellationToken ct = default)
-        => await _context.Secrets.FirstOrDefaultAsync(s => s.BankId == bankId, ct);
+    public async Task<Secret?> GetByClientIdAsync(string clientId, CancellationToken ct = default)
+        => await _context.Secrets.FirstOrDefaultAsync(s => s.ClientId == clientId, ct);
 
     public async Task AddAsync(Secret secret, CancellationToken ct = default)
         => await _context.Secrets.AddAsync(secret, ct);

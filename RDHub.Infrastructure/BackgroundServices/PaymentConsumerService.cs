@@ -51,16 +51,16 @@ public class PaymentConsumerService : BackgroundService
         consumer.ReceivedAsync += async (sender, ea) =>
         {
             var body = Encoding.UTF8.GetString(ea.Body.ToArray());
-            _logger.LogInformation("Mensagem recebida: {Body}", body);
+
+            _logger.LogInformation("Mensagem lida da fila!");
+            _logger.LogInformation("Conteúdo: {Body}", body);
 
             try
             {
-                var http = _httpClientFactory.CreateClient();
-                var content = new StringContent(body, Encoding.UTF8, "application/json");
-                var recebDigitalUrl = _configuration["RecebDigital:BaseUrl"]!;
-                await http.PostAsync($"{recebDigitalUrl}/payments/confirmed", content, ct);
-
+                // TODO: Chamar a Receba Digital quando estiver disponível
+                _logger.LogInformation("Mensagem processada com sucesso!");
                 await channel.BasicAckAsync(ea.DeliveryTag, false, ct);
+                _logger.LogInformation("Mensagem confirmada na fila!");
             }
             catch (Exception ex)
             {

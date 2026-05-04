@@ -8,7 +8,7 @@ namespace RDHub.Domain.Repositories;
 // contrato para buscar e salvar credenciais do banco
 public interface ISecretRepository
 {
-    Task<Secret?> GetByBankIdAsync(Guid bankId, CancellationToken ct = default);
+    Task<Secret?> GetByClientIdAsync(string clientId, CancellationToken ct = default);
     Task AddAsync(Secret secret, CancellationToken ct = default);
     Task UpdateAsync(Secret secret, CancellationToken ct = default);
 }
