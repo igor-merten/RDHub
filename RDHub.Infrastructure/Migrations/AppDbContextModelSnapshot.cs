@@ -36,8 +36,8 @@ namespace RDHub.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("BankId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("BankId")
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("ClientId")
                         .HasColumnType("uuid");
@@ -74,9 +74,6 @@ namespace RDHub.Infrastructure.Migrations
                     b.Property<decimal?>("Amount")
                         .HasColumnType("numeric");
 
-                    b.Property<Guid>("BankId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -104,7 +101,7 @@ namespace RDHub.Infrastructure.Migrations
                     b.ToTable("Audits");
                 });
 
-            modelBuilder.Entity("RDHub.Domain.Aggregates.Secret", b =>
+            modelBuilder.Entity("RDHub.Domain.Aggregates.Credential", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -128,7 +125,7 @@ namespace RDHub.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Secrets");
+                    b.ToTable("Credentials");
                 });
 #pragma warning restore 612, 618
         }

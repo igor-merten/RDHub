@@ -30,19 +30,31 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // ====== REPOSITORIES ======
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
-builder.Services.AddScoped<ISecretRepository, SecretRepository>();
+builder.Services.AddScoped<ICredentialRepository, CredentialRepository>();
 builder.Services.AddScoped<IAuditRepository, AuditRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // ====== BANK ADAPTERS ======
+//adapter1
 builder.Services.AddHttpClient<MockBankAdapter>(client =>
-    client.BaseAddress = new Uri(builder.Configuration["MockServer:BaseUrl"]!));
+    client.BaseAddress = new Uri(builder.Configuration["BanksBaseUrl:MockServer"]!));
 builder.Services.AddSingleton<IBankPixAdapter>(sp =>
 {
     var http = sp.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(MockBankAdapter));
     var bankId = builder.Configuration["BankAdapters:MockBankId"]!;
     return new MockBankAdapter(http, bankId);
 });
+
+//adapter2
+builder.Services.AddHttpClient<MockBank2Adapter>(client =>
+    client.BaseAddress = new Uri(builder.Configuration["BanksBaseUrl:MockServer"]!));
+builder.Services.AddSingleton<IBankPixAdapter>(sp =>
+{
+    var http = sp.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(MockBank2Adapter));
+    var bankId = builder.Configuration["BankAdapters:MockBank2Id"]!;
+    return new MockBank2Adapter(http, bankId);
+});
+
 builder.Services.AddSingleton<IBankAdapterFactory, BankAdapterFactory>();
 
 // ====== MESSAGING ======

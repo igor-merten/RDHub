@@ -6,12 +6,12 @@ using System.Text.Json;
 namespace RDHub.Infrastructure.BankAdapters;
 
 // adapter que se comunica com o MockServer simulando um banco real
-public class MockBankAdapter : IBankPixAdapter
+public class MockBank2Adapter : IBankPixAdapter
 {
     private readonly HttpClient _http;
     private readonly string _bankId;
 
-    public MockBankAdapter(HttpClient http, string bankId)
+    public MockBank2Adapter(HttpClient http, string bankId)
     {
         _http = http;
         _bankId = bankId;

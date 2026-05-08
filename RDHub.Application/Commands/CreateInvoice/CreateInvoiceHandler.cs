@@ -60,7 +60,6 @@ public sealed class CreateInvoiceHandler : IRequestHandler<CreateInvoiceCommand,
         // registra auditoria
         await _auditRepository.AddAsync(Audit.Create(
             accountId: cmd.AccountId,
-            bankId: account.BankId,
             action: "Invoice criada",
             detail: $"AccountId={cmd.AccountId}, Valor={cmd.Amount}, BankId={account.BankId}",
             txId: txId.Value,

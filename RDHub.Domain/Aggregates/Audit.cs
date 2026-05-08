@@ -7,7 +7,6 @@ namespace RDHub.Domain.Aggregates;
 public class Audit : AggregateRoot<Guid>
 {
     public Guid AccountId { get; private set; }
-    public Guid BankId { get; private set; }
     public string Action { get; private set; } = null!;
     public string Detail { get; private set; } = null!;
     public string? TxId { get; private set; }
@@ -22,7 +21,6 @@ public class Audit : AggregateRoot<Guid>
 
     public static Audit Create(
         Guid accountId,
-        Guid bankId,
         string action,
         string detail,
         string? txId = null,
@@ -45,7 +43,6 @@ public class Audit : AggregateRoot<Guid>
         {
             Id = Guid.NewGuid(),
             AccountId = accountId,
-            BankId = bankId,
             Action = action,
             Detail = detail,
             TxId = txId,

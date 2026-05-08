@@ -8,7 +8,7 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     public DbSet<Account> Accounts => Set<Account>();
-    public DbSet<Secret> Secrets => Set<Secret>();
+    public DbSet<Credential> Credentials => Set<Credential>();
     public DbSet<Audit> Audits => Set<Audit>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ public class AppDbContext : DbContext
             entity.Property(e => e.CreatedAt).IsRequired();
         });
 
-        modelBuilder.Entity<Secret>(entity =>
+        modelBuilder.Entity<Credential>(entity =>
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.ClientId).IsRequired();
@@ -38,7 +38,6 @@ public class AppDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.AccountId).IsRequired();
-            entity.Property(e => e.BankId).IsRequired();
             entity.Property(e => e.Action).IsRequired();
             entity.Property(e => e.Detail).IsRequired();
             entity.Property(e => e.CreatedAt).IsRequired();

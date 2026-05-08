@@ -3,16 +3,16 @@
 namespace RDHub.Domain.Aggregates;
 
 // Representa as credenciais de autenticação de um banco no HUB
-public class Secret : AggregateRoot<Guid>
+public class Credential : AggregateRoot<Guid>
 {
     public string ClientId { get; private set; } = null!;
     public string ClientSecret { get; private set; } = null!;
     public string Certificate { get; private set; } = null!;
     public string CertificatePassword { get; private set; } = null!;
 
-    private Secret() { }
+    private Credential() { }
 
-    public static Secret Create(
+    public static Credential Create(
         string clientId,
         string clientSecret,
         string certificate,
@@ -25,7 +25,7 @@ public class Secret : AggregateRoot<Guid>
         if (string.IsNullOrWhiteSpace(clientSecret))
             throw new DomainException("ClientSecret é obrigatório");
 
-        return new Secret
+        return new Credential
         {
             Id = Guid.NewGuid(),
             ClientId = clientId,

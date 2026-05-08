@@ -84,7 +84,6 @@ public sealed class ConfirmPaymentHandler : IRequestHandler<ConfirmPaymentComman
         // registra auditoria
         await _auditRepository.AddAsync(Audit.Create(
             accountId: invoiceAudit.AccountId,
-            bankId: account.BankId,
             action: "Pagamento confirmado",
             detail: $"TxId={cmd.TxId}, Valor={bankStatus.PaidAmount}",
             txId: cmd.TxId,

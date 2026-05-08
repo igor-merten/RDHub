@@ -6,7 +6,7 @@ namespace RDHub.Domain.Aggregates;
 public class Account : AggregateRoot<Guid>
 {
     public Guid ClientId { get; private set; }
-    public Guid BankId { get; private set; }
+    public int BankId { get; private set; }
     public string Agency { get; private set; } = null!;
     public string AccountNumber { get; private set; } = null!;
     public string Cnpj { get; private set; } = null!;
@@ -17,7 +17,7 @@ public class Account : AggregateRoot<Guid>
 
     public static Account Create(
         Guid clientId,
-        Guid bankId,
+        int bankId,
         string agency,
         string accountNumber,
         string cnpj,
@@ -26,7 +26,7 @@ public class Account : AggregateRoot<Guid>
         if (clientId == Guid.Empty)
             throw new DomainException("ClientId é obrigatório");
 
-        if (bankId == Guid.Empty)
+        if (bankId <= 0)
             throw new DomainException("BankId é obrigatório");
 
         if (string.IsNullOrWhiteSpace(agency))
