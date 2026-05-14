@@ -30,30 +30,35 @@ namespace RDHub.Infrastructure.Migrations
 
                     b.Property<string>("AccountNumber")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<string>("Agency")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
 
                     b.Property<int>("BankId")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("ClientId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Cnpj")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CredentialId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Document")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<string>("PixKey")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CredentialId");
 
                     b.ToTable("Accounts");
                 });
@@ -107,9 +112,6 @@ namespace RDHub.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<int>("BankId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Certificate")
                         .IsRequired()
                         .HasColumnType("text");
@@ -129,6 +131,52 @@ namespace RDHub.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Credentials");
+                });
+
+            modelBuilder.Entity("RDHub.Domain.Aggregates.PixKey", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.ToTable("PixKeys");
+                });
+
+            modelBuilder.Entity("RDHub.Domain.Aggregates.Account", b =>
+                {
+                    b.HasOne("RDHub.Domain.Aggregates.Credential", "Credential")
+                        .WithMany()
+                        .HasForeignKey("CredentialId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Credential");
+                });
+
+            modelBuilder.Entity("RDHub.Domain.Aggregates.PixKey", b =>
+                {
+                    b.HasOne("RDHub.Domain.Aggregates.Account", null)
+                        .WithMany("PixKeys")
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("RDHub.Domain.Aggregates.Account", b =>
+                {
+                    b.Navigation("PixKeys");
                 });
 #pragma warning restore 612, 618
         }

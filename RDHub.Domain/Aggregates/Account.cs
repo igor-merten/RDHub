@@ -5,26 +5,30 @@ namespace RDHub.Domain.Aggregates;
 // Representa a conta bancária de um cliente cadastrado no HUB
 public class Account : AggregateRoot<Guid>
 {
-    public Guid ClientId { get; private set; }
+    public Guid CredentialId { get; private set; }
     public int BankId { get; private set; }
     public string Agency { get; private set; } = null!;
     public string AccountNumber { get; private set; } = null!;
-    public string Cnpj { get; private set; } = null!;
+    public string Document { get; private set; } = null!;
     public string PixKey { get; private set; } = null!;
     public DateTime CreatedAt { get; private set; }
+
+
+    // Propriedades de Navegação (Para o EF Core)
+    public virtual Credential Credential { get; private set; } = null!;
+    public virtual ICollection<PixKey> PixKeys { get; private set; } = new List<PixKey>();
 
     private Account() { }
 
     public static Account Create(
-        Guid clientId,
+        Guid credentialId,
+        string document,
         int bankId,
-        string agency,
         string accountNumber,
-        string cnpj,
-        string pixKey)
+        string agency)
     {
-        if (clientId == Guid.Empty)
-            throw new DomainException("ClientId é obrigatório");
+        if (credentialId == Guid.Empty)
+            throw new DomainException("CredentialId é obrigatório");
 
         if (bankId <= 0)
             throw new DomainException("BankId é obrigatório");
@@ -35,21 +39,17 @@ public class Account : AggregateRoot<Guid>
         if (string.IsNullOrWhiteSpace(accountNumber))
             throw new DomainException("Número da conta é obrigatório");
 
-        if (string.IsNullOrWhiteSpace(cnpj))
-            throw new DomainException("CNPJ é obrigatório");
-
-        if (string.IsNullOrWhiteSpace(pixKey))
-            throw new DomainException("Chave Pix é obrigatória");
+        if (string.IsNullOrWhiteSpace(document))
+            throw new DomainException("Documento é obrigatório");
 
         return new Account
         {
             Id = Guid.NewGuid(),
-            ClientId = clientId,
+            CredentialId = credentialId,
+            Document = document,
             BankId = bankId,
-            Agency = agency,
             AccountNumber = accountNumber,
-            Cnpj = cnpj,
-            PixKey = pixKey,
+            Agency = agency,
             CreatedAt = DateTime.UtcNow
         };
     }

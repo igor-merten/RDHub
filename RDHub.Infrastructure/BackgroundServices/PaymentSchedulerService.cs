@@ -54,7 +54,8 @@ public class PaymentSchedulerService : BackgroundService
         foreach (var audit in openCharges)
         {
             _logger.LogInformation("Verificando cobrança: TxId={TxId}", audit.TxId);
-            var result = await mediator.Send(new ConfirmPaymentCommand(audit.TxId!), ct);
+            var result = await mediator.Send(new GetChargeStatusQuery(audit.TxId!), ct);
+            //var result = await mediator.Send(new ConfirmPaymentCommand(audit.TxId!), ct);
             _logger.LogInformation("Status da cobrança {TxId}: {Status}", audit.TxId, result.Status);
         }
     }

@@ -16,8 +16,8 @@ public class CredentialRepository : ICredentialRepository
 
     public async Task<Credential?> GetByClientIdAsync(string clientId, CancellationToken ct = default)
         => await _context.Credentials.FirstOrDefaultAsync(s => s.ClientId == clientId, ct);
-    public async Task<Credential?> GetByBankIdAsync(int bankId, CancellationToken ct = default)
-    => await _context.Credentials.FirstOrDefaultAsync(c => c.BankId == bankId, ct);
+    //public async Task<Credential?> GetByBankIdAsync(int bankId, CancellationToken ct = default)
+    //=> await _context.Credentials.FirstOrDefaultAsync(c => c.BankId == bankId, ct);
 
     public async Task AddAsync(Credential credential, CancellationToken ct = default)
         => await _context.Credentials.AddAsync(credential, ct);
