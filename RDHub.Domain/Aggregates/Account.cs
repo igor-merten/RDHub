@@ -10,7 +10,6 @@ public class Account : AggregateRoot<Guid>
     public string Agency { get; private set; } = null!;
     public string AccountNumber { get; private set; } = null!;
     public string Document { get; private set; } = null!;
-    public string PixKey { get; private set; } = null!;
     public DateTime CreatedAt { get; private set; }
 
 
@@ -52,5 +51,19 @@ public class Account : AggregateRoot<Guid>
             Agency = agency,
             CreatedAt = DateTime.UtcNow
         };
+    }
+
+    public void Update(string agency, string accountNumber, string document)
+    {
+        if (string.IsNullOrWhiteSpace(agency))
+            throw new DomainException("Agência é obrigatória");
+        if (string.IsNullOrWhiteSpace(accountNumber))
+            throw new DomainException("Número da conta é obrigatório");
+        if (string.IsNullOrWhiteSpace(document))
+            throw new DomainException("Documento é obrigatório");
+
+        Agency = agency;
+        AccountNumber = accountNumber;
+        Document = document;
     }
 }

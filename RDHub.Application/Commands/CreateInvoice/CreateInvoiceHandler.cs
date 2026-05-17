@@ -48,8 +48,7 @@ public sealed class CreateInvoiceHandler : IRequestHandler<CreateInvoiceCommand,
         // cria cobrança 
         var bankResponse = await adapter.CreateChargeAsync(new BankChargeRequest(
             TxId: txId.Value,
-            Amount: cmd.Amount,
-            PixKey: account.PixKey), ct);
+            Amount: cmd.Amount), ct);
 
         // cria pix charge com o qr code retornado pelo banco
         var pixCharge = PixCharge.Create(txId, invoice.Id, account.BankId.ToString(), bankResponse.Emv);

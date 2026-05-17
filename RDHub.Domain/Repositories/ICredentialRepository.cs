@@ -9,7 +9,8 @@ namespace RDHub.Domain.Repositories;
 public interface ICredentialRepository
 {
     Task<Credential?> GetByClientIdAsync(string clientId, CancellationToken ct = default);
-    //Task<Credential?> GetByBankIdAsync(int bankId, CancellationToken ct = default);
+    Task<Credential?> GetByIdAsync(Guid id, CancellationToken ct = default);
     Task AddAsync(Credential credential, CancellationToken ct = default);
     Task UpdateAsync(Credential credential, CancellationToken ct = default);
+    Task DeleteAsync(Credential credential, CancellationToken ct = default);
 }

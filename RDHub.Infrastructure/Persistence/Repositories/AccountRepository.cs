@@ -23,4 +23,7 @@ public class AccountRepository : IAccountRepository
 
     public async Task UpdateAsync(Account account, CancellationToken ct = default)
         => _context.Accounts.Update(account);
+
+    public async Task DeleteAsync(Account account, CancellationToken ct = default)
+    => _context.Accounts.Remove(account);
 }

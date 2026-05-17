@@ -6,8 +6,7 @@ namespace RDHub.Application.DTOs;
 
 public sealed record BankChargeRequest(
     string TxId,
-    decimal Amount,
-    string PixKey);
+    decimal Amount);
 
 public sealed record BankChargeResponse(
     string TxId,

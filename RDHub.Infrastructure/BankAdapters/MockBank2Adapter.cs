@@ -26,8 +26,7 @@ public class MockBank2Adapter : IBankPixAdapter
         var payload = new
         {
             txId = request.TxId,
-            amount = request.Amount,
-            pixKey = request.PixKey
+            amount = request.Amount
         };
 
         var content = new StringContent(

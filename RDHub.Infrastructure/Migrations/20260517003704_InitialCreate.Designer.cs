@@ -12,8 +12,8 @@ using RDHub.Infrastructure.Persistence;
 namespace RDHub.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260514003648_UpdateSchema")]
-    partial class UpdateSchema
+    [Migration("20260517003704_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,10 +54,6 @@ namespace RDHub.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
-
-                    b.Property<string>("PixKey")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.HasKey("Id");
 

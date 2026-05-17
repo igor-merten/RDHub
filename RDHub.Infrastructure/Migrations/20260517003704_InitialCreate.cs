@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace RDHub.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateSchema : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -57,7 +57,6 @@ namespace RDHub.Infrastructure.Migrations
                     Agency = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
                     AccountNumber = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     Document = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
-                    PixKey = table.Column<string>(type: "text", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>

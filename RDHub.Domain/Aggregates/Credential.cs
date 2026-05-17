@@ -34,4 +34,14 @@ public class Credential : AggregateRoot<Guid>
             CertificatePassword = certificatePassword,
         };
     }
+
+    public void Update(string clientSecret, string certificate, string certificatePassword)
+    {
+        if (string.IsNullOrWhiteSpace(clientSecret))
+            throw new DomainException("ClientSecret é obrigatório");
+
+        ClientSecret = clientSecret;
+        Certificate = certificate;
+        CertificatePassword = certificatePassword;
+    }
 }
