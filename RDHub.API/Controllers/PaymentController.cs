@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using RDHub.Application.Commands.ConfirmPayment;
 using RDHub.Application.Commands.CreateInvoice;
 using RDHub.Application.Queries.GetChargeStatus;
+using RDHub.Application.Commands.CreateCob;
 
 namespace RDHub.API.Controllers;
 
-// Controller responsável por receber as requisições da Receba Digital
 [ApiController]
 [Route("api/[controller]")]
 public class PaymentController : ControllerBase
@@ -46,5 +46,15 @@ public class PaymentController : ControllerBase
     {
         var result = await _mediator.Send(new GetChargeStatusQuery(txId), ct);
         return Ok(result);
+    }
+
+    // cria cobrança pix imediata (cob) 
+    [HttpPost("charge/v1/cob")]
+    public async Task<IActionResult> CreateCob(
+        [FromBody] CreateCobCommand command,
+        CancellationToken ct)
+    {
+        var result = await _mediator.Send(command, ct);
+        return CreatedAtAction(nameof(GetChargeStatus), new { txId = result.TxId }, result);
     }
 }
