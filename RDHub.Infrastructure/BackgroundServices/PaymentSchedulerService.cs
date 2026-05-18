@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -55,8 +55,15 @@ public class PaymentSchedulerService : BackgroundService
         {
             _logger.LogInformation("Verificando cobrança: TxId={TxId}", audit.TxId);
             var result = await mediator.Send(new GetChargeStatusQuery(audit.TxId!), ct);
-            //var result = await mediator.Send(new ConfirmPaymentCommand(audit.TxId!), ct);
+            
             _logger.LogInformation("Status da cobrança {TxId}: {Status}", audit.TxId, result.Status);
+
+            // Se o branco responder que foi pago, dispara o command para dar baixa no sistema
+            if (result.Status == "Paid")
+            {
+                await mediator.Send(new ConfirmPaymentCommand(audit.TxId!), ct);
+                _logger.LogInformation("Cobrança {TxId} confirmada.", audit.TxId);
+            }
         }
     }
 }
