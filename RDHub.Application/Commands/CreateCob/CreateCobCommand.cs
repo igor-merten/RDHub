@@ -3,7 +3,7 @@ using MediatR;
 namespace RDHub.Application.Commands.CreateCob;
 
 public sealed record CreateCobCommand(
-    Guid InvoiceId,
+    Guid AccountId,
     string ChargeType,
     decimal Amount,
     string PixKey,

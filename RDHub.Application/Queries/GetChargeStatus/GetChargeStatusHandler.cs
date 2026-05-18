@@ -33,9 +33,10 @@ public sealed class GetChargeStatusHandler
             return new GetChargeStatusResult(
                 TxId: query.TxId,
                 Status: "Paid",
-                Amount: paymentConfirmed.Amount,
                 PaidAmount: paymentConfirmed.PaidAmount,
-                PaidAt: paymentConfirmed.PaidAt);
+                PaidAt: paymentConfirmed.PaidAt,
+                PaymentId: paymentConfirmed.Id,
+                Raw: "seila");
         }
 
         // Se não há pagamento confirmado, retorna como Open
@@ -43,8 +44,10 @@ public sealed class GetChargeStatusHandler
         return new GetChargeStatusResult(
             TxId: query.TxId,
             Status: "Open",
-            Amount: invoiceAudit?.Amount,
             PaidAmount: null,
-            PaidAt: null);
+            PaidAt: null,
+            PaymentId: null,
+            Raw: null
+        );
     }
 }

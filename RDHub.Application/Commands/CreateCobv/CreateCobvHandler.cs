@@ -30,11 +30,11 @@ public sealed class CreateCobvHandler : IRequestHandler<CreateCobvCommand, Creat
     public async Task<CreateCobvResult> Handle(CreateCobvCommand cmd, CancellationToken ct)
     {
         // busca usuario para obter BankId e PixKey
-        var account = await _accountRepository.GetByIdAsync(cmd.InvoiceId, ct)
+        var account = await _accountRepository.GetByIdAsync(cmd.AccountId, ct)
             ?? throw new Exception("Conta não encontrada");
 
         // cria invoice no domínio
-        var invoice = Invoice.Create(cmd.InvoiceId, Money.BRL(cmd.Amount));
+        var invoice = Invoice.Create(cmd.AccountId, Money.BRL(cmd.Amount));
 
         // gera TxId único
         var txId = TxId.Generate();
@@ -43,7 +43,7 @@ public sealed class CreateCobvHandler : IRequestHandler<CreateCobvCommand, Creat
         var adapter = _adapterFactory.Get(account.BankId.ToString());
 
         // cria cobrança e recebe response
-        var bankResponse = await adapter.CreateChargeAsync(new BankChargeRequest(
+        var bankResponse = await adapter.CreateCobV(new BankChargeRequest(
             TxId: txId.Value,
             Amount: cmd.Amount), ct);
 
@@ -55,9 +55,9 @@ public sealed class CreateCobvHandler : IRequestHandler<CreateCobvCommand, Creat
 
         // registra auditoria
         await _auditRepository.AddAsync(Audit.Create(
-            accountId: cmd.InvoiceId,
+            accountId: cmd.AccountId,
             action: "Cobv criada",
-            detail: $"InvoiceId={cmd.InvoiceId}, Valor={cmd.Amount}, PixKey={cmd.PixKey}, Tipo={cmd.ChargeType}, Vencimento={cmd.DueDate:yyyy-MM-dd}",
+            detail: $"InvoiceId={cmd.AccountId}, Valor={cmd.Amount}, PixKey={cmd.PixKey}, Tipo={cmd.ChargeType}, Vencimento={cmd.DueDate:yyyy-MM-dd}",
             txId: txId.Value,
             amount: cmd.Amount,
             currency: "BRL",

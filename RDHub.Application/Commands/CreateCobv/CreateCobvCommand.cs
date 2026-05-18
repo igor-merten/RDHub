@@ -3,7 +3,7 @@ using MediatR;
 namespace RDHub.Application.Commands.CreateCobv;
 
 public sealed record CreateCobvCommand(
-    Guid InvoiceId,
+    Guid AccountId,
     string ChargeType,
     decimal Amount,
     string PixKey,

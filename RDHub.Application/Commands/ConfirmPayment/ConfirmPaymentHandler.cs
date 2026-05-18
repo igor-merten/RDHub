@@ -48,6 +48,7 @@ public sealed class ConfirmPaymentHandler : IRequestHandler<ConfirmPaymentComman
             var paidAudit = audits.First(a => a.Status == "Paid");
             return new ConfirmPaymentResult(
                 TxId: cmd.TxId,
+                isPaid: true,
                 Status: "Paid",
                 PaidAmount: paidAudit.PaidAmount,
                 PaidAt: paidAudit.PaidAt);
@@ -69,6 +70,7 @@ public sealed class ConfirmPaymentHandler : IRequestHandler<ConfirmPaymentComman
         if (bankStatus.Status != "Paid")
             return new ConfirmPaymentResult(
                 TxId: cmd.TxId,
+                isPaid: false,
                 Status: bankStatus.Status,
                 PaidAmount: null,
                 PaidAt: null);
@@ -107,6 +109,7 @@ public sealed class ConfirmPaymentHandler : IRequestHandler<ConfirmPaymentComman
 
         return new ConfirmPaymentResult(
             TxId: cmd.TxId,
+            isPaid: true,
             Status: "Paid",
             PaidAmount: bankStatus.PaidAmount,
             PaidAt: bankStatus.PaidAt);

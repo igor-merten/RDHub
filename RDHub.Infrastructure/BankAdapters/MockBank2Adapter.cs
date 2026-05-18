@@ -19,7 +19,7 @@ public class MockBank2Adapter : IBankPixAdapter
 
     public string BankId => _bankId;
 
-    public async Task<BankChargeResponse> CreateChargeAsync(
+    public async Task<BankChargeResponse> CreateCob(
         BankChargeRequest request,
         CancellationToken ct = default)
     {
@@ -34,7 +34,34 @@ public class MockBank2Adapter : IBankPixAdapter
             System.Text.Encoding.UTF8,
             "application/json");
 
-        var response = await _http.PostAsync("/pix/charge", content, ct);
+        var response = await _http.PostAsync("/charge/cob", content, ct);
+        response.EnsureSuccessStatusCode();
+
+        var raw = await response.Content.ReadAsStringAsync(ct);
+        var result = JsonSerializer.Deserialize<JsonElement>(raw);
+
+        return new BankChargeResponse(
+            TxId: request.TxId,
+            Status: result.GetProperty("status").GetString() ?? "Open",
+            Emv: result.GetProperty("emv").GetString() ?? string.Empty);
+    }
+
+    public async Task<BankChargeResponse> CreateCobV(
+        BankChargeRequest request,
+        CancellationToken ct = default)
+    {
+        var payload = new
+        {
+            txId = request.TxId,
+            amount = request.Amount
+        };
+
+        var content = new StringContent(
+            JsonSerializer.Serialize(payload),
+            System.Text.Encoding.UTF8,
+            "application/json");
+
+        var response = await _http.PostAsync("/charge/cobv", content, ct);
         response.EnsureSuccessStatusCode();
 
         var raw = await response.Content.ReadAsStringAsync(ct);

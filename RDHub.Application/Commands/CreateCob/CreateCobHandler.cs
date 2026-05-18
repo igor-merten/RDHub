@@ -28,16 +28,16 @@ public sealed class CreateCobHandler : IRequestHandler<CreateCobCommand, CreateC
 
     public async Task<CreateCobResult> Handle(CreateCobCommand cmd, CancellationToken ct)
     {
-        var account = await _accountRepository.GetByIdAsync(cmd.InvoiceId, ct)
+        var account = await _accountRepository.GetByIdAsync(cmd.AccountId, ct)
             ?? throw new Exception("Conta não encontrada");
 
-        var invoice = Invoice.Create(cmd.InvoiceId, Money.BRL(cmd.Amount));
+        var invoice = Invoice.Create(cmd.AccountId, Money.BRL(cmd.Amount));
 
         var txId = TxId.Generate();
 
         var adapter = _adapterFactory.Get(account.BankId.ToString());
 
-        var bankResponse = await adapter.CreateChargeAsync(new BankChargeRequest(
+        var bankResponse = await adapter.CreateCob(new BankChargeRequest(
             TxId: txId.Value,
             Amount: cmd.Amount), ct);
 
@@ -46,9 +46,9 @@ public sealed class CreateCobHandler : IRequestHandler<CreateCobCommand, CreateC
         invoice.AssignTxId(txId);
 
         await _auditRepository.AddAsync(Audit.Create(
-            accountId: cmd.InvoiceId,
+            accountId: cmd.AccountId,
             action: "Cob criada",
-            detail: $"InvoiceId={cmd.InvoiceId}, Valor={cmd.Amount}, PixKey={cmd.PixKey}, Tipo={cmd.ChargeType}",
+            detail: $"InvoiceId={cmd.AccountId}, Valor={cmd.Amount}, PixKey={cmd.PixKey}, Tipo={cmd.ChargeType}",
             txId: txId.Value,
             amount: cmd.Amount,
             currency: "BRL",

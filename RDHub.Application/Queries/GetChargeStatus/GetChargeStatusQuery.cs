@@ -9,6 +9,7 @@ public sealed record GetChargeStatusQuery(
 public sealed record GetChargeStatusResult(
     string TxId,
     string Status,
-    decimal? Amount,
     decimal? PaidAmount,
-    DateTime? PaidAt);
+    DateTime? PaidAt,
+    Guid? PaymentId,
+    string? Raw);
