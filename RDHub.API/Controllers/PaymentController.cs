@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using RDHub.Application.Commands.ConfirmPayment;
-using RDHub.Application.Commands.CreateInvoice;
 using RDHub.Application.Queries.GetChargeStatus;
 using RDHub.Application.Commands.CreateCob;
 using RDHub.Application.Commands.CreateCobv;
@@ -19,18 +18,8 @@ public class PaymentController : ControllerBase
         _mediator = mediator;
     }
 
-    // cria uma nova cobrança pix para um usuário
-    [HttpPost("charge")]
-    public async Task<IActionResult> CreateCharge(
-        [FromBody] CreateInvoiceCommand command,
-        CancellationToken ct)
-    {
-        var result = await _mediator.Send(command, ct);
-        return CreatedAtAction(nameof(GetChargeStatus), new { txId = result.TxId }, result);
-    }
-
     // confirma manualmente o pagamento de uma cobrança
-    [HttpPost("{txId}/confirm")]
+    [HttpPost("validate/v1/{txId}")]
     public async Task<IActionResult> ConfirmPayment(
         [FromRoute] string txId,
         CancellationToken ct)
@@ -40,7 +29,7 @@ public class PaymentController : ControllerBase
     }
 
     // consulta o status de uma cobrança
-    [HttpGet("{txId}/status")]
+    [HttpGet("status/v1/{txId}")]
     public async Task<IActionResult> GetChargeStatus(
         [FromRoute] string txId,
         CancellationToken ct)

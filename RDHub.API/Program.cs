@@ -1,6 +1,5 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using RDHub.Application.Commands.CreateInvoice;
 using RDHub.Application.Interfaces;
 using RDHub.API.Middleware;
 using RDHub.Domain.Repositories;
@@ -10,6 +9,7 @@ using RDHub.Infrastructure.BackgroundServices;
 using RDHub.Infrastructure.Messaging;
 using RDHub.Infrastructure.Persistence;
 using RDHub.Infrastructure.Persistence.Repositories;
+using RDHub.Application.Commands.CreateCob;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +22,7 @@ builder.Services.AddHttpClient("RecebDigital", client =>
 
 // ====== MEDIATR ======
 builder.Services.AddMediatR(cfg =>
-    cfg.RegisterServicesFromAssembly(typeof(CreateInvoiceCommand).Assembly));
+    cfg.RegisterServicesFromAssembly(typeof(CreateCobCommand).Assembly));
 
 // ====== DATABASE ======
 builder.Services.AddDbContext<AppDbContext>(options =>

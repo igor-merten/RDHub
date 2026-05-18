@@ -7,6 +7,7 @@ using RDHub.Domain.ValueObjects;
 
 namespace RDHub.Application.Commands.CreateCobv;
 
+//cria cobv
 public sealed class CreateCobvHandler : IRequestHandler<CreateCobvCommand, CreateCobvResult>
 {
     private readonly IAccountRepository _accountRepository;
@@ -28,23 +29,31 @@ public sealed class CreateCobvHandler : IRequestHandler<CreateCobvCommand, Creat
 
     public async Task<CreateCobvResult> Handle(CreateCobvCommand cmd, CancellationToken ct)
     {
+        // busca usuario para obter BankId e PixKey
         var account = await _accountRepository.GetByIdAsync(cmd.InvoiceId, ct)
             ?? throw new Exception("Conta não encontrada");
 
+        // cria invoice no domínio
         var invoice = Invoice.Create(cmd.InvoiceId, Money.BRL(cmd.Amount));
 
+        // gera TxId único
         var txId = TxId.Generate();
 
+        // obtem adapter do banco
         var adapter = _adapterFactory.Get(account.BankId.ToString());
 
+        // cria cobrança e recebe response
         var bankResponse = await adapter.CreateChargeAsync(new BankChargeRequest(
             TxId: txId.Value,
             Amount: cmd.Amount), ct);
 
+        // cria pix charge com o qr code retornado pelo banco
         var pixCharge = PixCharge.Create(txId, invoice.Id, account.BankId.ToString(), bankResponse.Emv);
 
+        // associa txid à invoice
         invoice.AssignTxId(txId);
 
+        // registra auditoria
         await _auditRepository.AddAsync(Audit.Create(
             accountId: cmd.InvoiceId,
             action: "Cobv criada",
@@ -54,14 +63,14 @@ public sealed class CreateCobvHandler : IRequestHandler<CreateCobvCommand, Creat
             currency: "BRL",
             status: invoice.Status.ToString()), ct);
 
+        //persiste no banco de dados
         await _unitOfWork.SaveChangesAsync(ct);
 
+        //devolve response para rd
         return new CreateCobvResult(
             TxId: txId.Value,
             Status: invoice.Status.ToString(),
             Emv: bankResponse.Emv,
-            PixLink: $"pix.example.com/{txId.Value}",
-            DueDate: cmd.DueDate,
-            ExpiresInSeconds: cmd.ExpiresInSeconds);
+            PixLink: $"pix.example.com/{txId.Value}");
     }
 }
