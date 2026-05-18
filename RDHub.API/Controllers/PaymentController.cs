@@ -4,6 +4,7 @@ using RDHub.Application.Commands.ConfirmPayment;
 using RDHub.Application.Commands.CreateInvoice;
 using RDHub.Application.Queries.GetChargeStatus;
 using RDHub.Application.Commands.CreateCob;
+using RDHub.Application.Commands.CreateCobv;
 
 namespace RDHub.API.Controllers;
 
@@ -52,6 +53,16 @@ public class PaymentController : ControllerBase
     [HttpPost("charge/v1/cob")]
     public async Task<IActionResult> CreateCob(
         [FromBody] CreateCobCommand command,
+        CancellationToken ct)
+    {
+        var result = await _mediator.Send(command, ct);
+        return CreatedAtAction(nameof(GetChargeStatus), new { txId = result.TxId }, result);
+    }
+
+    // cria cobrança pix com vencimento (cobv)
+    [HttpPost("charge/v1/cobv")]
+    public async Task<IActionResult> CreateCobv(
+        [FromBody] CreateCobvCommand command,
         CancellationToken ct)
     {
         var result = await _mediator.Send(command, ct);
