@@ -28,10 +28,10 @@ public sealed class CreateCobHandler : IRequestHandler<CreateCobCommand, CreateC
 
     public async Task<CreateCobResult> Handle(CreateCobCommand cmd, CancellationToken ct)
     {
-        var account = await _accountRepository.GetByIdAsync(cmd.AccountId, ct)
+        var account = await _accountRepository.GetByIdAsync(cmd.InvoiceId, ct)
             ?? throw new Exception("Conta não encontrada");
 
-        var invoice = Invoice.Create(cmd.AccountId, Money.BRL(cmd.Amount));
+        var invoice = Invoice.Create(Money.BRL(cmd.Amount), cmd.DueDate, account.BankId.ToString());
 
         var txId = TxId.Generate();
 
@@ -46,9 +46,9 @@ public sealed class CreateCobHandler : IRequestHandler<CreateCobCommand, CreateC
         invoice.AssignTxId(txId);
 
         await _auditRepository.AddAsync(Audit.Create(
-            accountId: cmd.AccountId,
+            accountId: cmd.InvoiceId,
             action: "Cob criada",
-            detail: $"InvoiceId={cmd.AccountId}, Valor={cmd.Amount}, PixKey={cmd.PixKey}, Tipo={cmd.ChargeType}",
+            detail: $"InvoiceId={cmd.InvoiceId}, Valor={cmd.Amount}, PixKey={cmd.PixKey}, Tipo={cmd.ChargeType}",
             txId: txId.Value,
             amount: cmd.Amount,
             currency: "BRL",

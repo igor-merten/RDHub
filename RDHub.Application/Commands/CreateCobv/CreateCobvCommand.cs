@@ -3,11 +3,11 @@ using MediatR;
 namespace RDHub.Application.Commands.CreateCobv;
 
 public sealed record CreateCobvCommand(
-    Guid AccountId,
+    Guid InvoiceId,
     string ChargeType,
     decimal Amount,
     string PixKey,
-    DateTime DueDate,
+    DateOnly DueDate,
     int ExpiresInSeconds,
     string PayerMessage) : IRequest<CreateCobvResult>;
 

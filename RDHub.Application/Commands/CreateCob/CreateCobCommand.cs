@@ -3,11 +3,11 @@ using MediatR;
 namespace RDHub.Application.Commands.CreateCob;
 
 public sealed record CreateCobCommand(
-    Guid AccountId,
+    Guid InvoiceId,
     string ChargeType,
     decimal Amount,
     string PixKey,
-    DateTime DueDate,
+    DateOnly DueDate,
     int ExpiresInSeconds,
     string PayerMessage) : IRequest<CreateCobResult>;
 

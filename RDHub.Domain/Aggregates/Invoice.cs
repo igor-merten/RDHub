@@ -1,33 +1,44 @@
 ﻿using RDHub.Domain.Exceptions;
 using RDHub.Domain.ValueObjects;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace RDHub.Domain.Aggregates;
 
 // representa a intenção de cobrança criada pela Receba Digital
 public class Invoice : AggregateRoot<Guid>
 {
-    public Guid AccountId { get; private set; }
     public Money Amount { get; private set; } = null!;
+    public DateOnly DueDate { get; private set; }
     public InvoiceStatus Status { get; private set; }
     public TxId? TxId { get; private set; }
+    public string? ExternalReference { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime? PaidAt { get; private set; }
+    public string BankId { get; private set; } = null!;
 
     private Invoice() { }
 
-    public static Invoice Create(Guid accountId, Money amount)
+    public static Invoice Create(
+        Money amount,
+        DateOnly dueDate,
+        string bankId,
+        string? externalReference = null)
     {
-        if (accountId == Guid.Empty)
-            throw new DomainException("AccountId é obrigatório");
+        if (amount.Value <= 0)
+            throw new DomainException("O valor da fatura deve ser positivo");
+
+        if (dueDate < DateOnly.FromDateTime(DateTime.Today))
+            throw new DomainException("A data de vencimento não pode ser no passado");
+
+        if (string.IsNullOrWhiteSpace(bankId))
+            throw new DomainException("O banco deve ser informado");
 
         var invoice = new Invoice
         {
             Id = Guid.NewGuid(),
-            AccountId = accountId,
             Amount = amount,
+            DueDate = dueDate,
+            BankId = bankId,
+            ExternalReference = externalReference,
             Status = InvoiceStatus.Open,
             CreatedAt = DateTime.UtcNow
         };
