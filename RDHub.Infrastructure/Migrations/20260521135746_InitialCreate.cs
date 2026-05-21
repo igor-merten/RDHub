@@ -17,14 +17,11 @@ namespace RDHub.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     AccountId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Action = table.Column<string>(type: "text", nullable: false),
-                    Detail = table.Column<string>(type: "text", nullable: false),
+                    Payloads = table.Column<string>(type: "text", nullable: false),
                     TxId = table.Column<string>(type: "text", nullable: true),
                     Amount = table.Column<decimal>(type: "numeric", nullable: true),
-                    Currency = table.Column<string>(type: "text", nullable: true),
                     Status = table.Column<string>(type: "text", nullable: true),
-                    PaidAmount = table.Column<decimal>(type: "numeric", nullable: true),
-                    PaidAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    PaymentConfirmationTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -57,7 +54,8 @@ namespace RDHub.Infrastructure.Migrations
                     Agency = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
                     AccountNumber = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     Document = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Active = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {

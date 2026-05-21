@@ -33,6 +33,9 @@ namespace RDHub.Infrastructure.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
+                    b.Property<bool>("Active")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Agency")
                         .IsRequired()
                         .HasMaxLength(10)
@@ -68,27 +71,17 @@ namespace RDHub.Infrastructure.Migrations
                     b.Property<Guid>("AccountId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Action")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<decimal?>("Amount")
                         .HasColumnType("numeric");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Currency")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Detail")
+                    b.Property<string>("Payloads")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<decimal?>("PaidAmount")
-                        .HasColumnType("numeric");
-
-                    b.Property<DateTime?>("PaidAt")
+                    b.Property<DateTime?>("PaymentConfirmationTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Status")

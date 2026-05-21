@@ -9,4 +9,4 @@ namespace RDHub.Application.Commands.ConfirmPayment;
 public sealed record ConfirmPaymentCommand(string TxId) : IRequest<ConfirmPaymentResult>;
 
 // resultado retornado após confirmação
-public sealed record ConfirmPaymentResult(string TxId, bool isPaid, string Status, decimal? PaidAmount, DateTime? PaidAt);
+public sealed record ConfirmPaymentResult(string TxId, bool isPaid, string Status, DateTime? PaymentConfirmationTime);

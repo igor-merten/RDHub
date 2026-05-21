@@ -47,11 +47,9 @@ public sealed class CreateCobHandler : IRequestHandler<CreateCobCommand, CreateC
 
         await _auditRepository.AddAsync(Audit.Create(
             accountId: cmd.InvoiceId,
-            action: "Cob criada",
-            detail: $"InvoiceId={cmd.InvoiceId}, Valor={cmd.Amount}, PixKey={cmd.PixKey}, Tipo={cmd.ChargeType}",
+            payloads: $"Solicitação={cmd}",
             txId: txId.Value,
             amount: cmd.Amount,
-            currency: "BRL",
             status: invoice.Status.ToString()), ct);
 
         await _unitOfWork.SaveChangesAsync(ct);

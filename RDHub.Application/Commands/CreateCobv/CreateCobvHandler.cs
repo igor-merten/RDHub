@@ -1,9 +1,10 @@
 using MediatR;
-using RDHub.Application.Interfaces;
 using RDHub.Application.DTOs;
+using RDHub.Application.Interfaces;
 using RDHub.Domain.Aggregates;
 using RDHub.Domain.Repositories;
 using RDHub.Domain.ValueObjects;
+using System.Net.NetworkInformation;
 
 namespace RDHub.Application.Commands.CreateCobv;
 
@@ -47,11 +48,9 @@ public sealed class CreateCobvHandler : IRequestHandler<CreateCobvCommand, Creat
 
         await _auditRepository.AddAsync(Audit.Create(
             accountId: cmd.InvoiceId,
-            action: "Cobv criada",
-            detail: $"InvoiceId={cmd.InvoiceId}, Valor={cmd.Amount}, PixKey={cmd.PixKey}, Tipo={cmd.ChargeType}, Vencimento={cmd.DueDate:yyyy-MM-dd}",
+            payloads: $"Solicitação={cmd}",
             txId: txId.Value,
             amount: cmd.Amount,
-            currency: "BRL",
             status: invoice.Status.ToString()), ct);
 
         await _unitOfWork.SaveChangesAsync(ct);

@@ -11,6 +11,7 @@ public class Account : AggregateRoot<Guid>
     public string AccountNumber { get; private set; } = null!;
     public string Document { get; private set; } = null!;
     public DateTime CreatedAt { get; private set; }
+    public bool Active { get; private set; }
 
 
     // Propriedades de Navegação (Para o EF Core)
@@ -49,7 +50,8 @@ public class Account : AggregateRoot<Guid>
             BankId = bankId,
             AccountNumber = accountNumber,
             Agency = agency,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            Active = true
         };
     }
 
@@ -65,5 +67,13 @@ public class Account : AggregateRoot<Guid>
         Agency = agency;
         AccountNumber = accountNumber;
         Document = document;
+    }
+
+    public void Deactivate()
+    {
+        if (!Active)
+            throw new DomainException("Conta já está inativa");
+
+        Active = false;
     }
 }

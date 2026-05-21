@@ -32,6 +32,7 @@ public class AppDbContext : DbContext
             entity.Property(e => e.Agency).IsRequired().HasMaxLength(10);
             entity.Property(e => e.AccountNumber).IsRequired().HasMaxLength(20);
             entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.Active).IsRequired();
 
             // Configuração da FK para Credential (1 Account -> 1 Credential)
             entity.HasOne(e => e.Credential)
@@ -56,15 +57,12 @@ public class AppDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.AccountId).IsRequired();
-            entity.Property(e => e.Action).IsRequired();
-            entity.Property(e => e.Detail).IsRequired();
+            entity.Property(e => e.Payloads).IsRequired();
             entity.Property(e => e.CreatedAt).IsRequired();
             entity.Property(e => e.TxId);
             entity.Property(e => e.Amount);
-            entity.Property(e => e.Currency);
             entity.Property(e => e.Status);
-            entity.Property(e => e.PaidAmount);
-            entity.Property(e => e.PaidAt);
+            entity.Property(e => e.PaymentConfirmationTime);
         });
     }
 }

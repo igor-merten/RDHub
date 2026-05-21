@@ -50,8 +50,7 @@ public sealed class ConfirmPaymentHandler : IRequestHandler<ConfirmPaymentComman
                 TxId: cmd.TxId,
                 isPaid: true,
                 Status: "Paid",
-                PaidAmount: paidAudit.PaidAmount,
-                PaidAt: paidAudit.PaidAt);
+                PaymentConfirmationTime: paidAudit.PaymentConfirmationTime);
         }
 
         // busca a audit de Invoice criada para obter valor e AccountId
@@ -72,8 +71,7 @@ public sealed class ConfirmPaymentHandler : IRequestHandler<ConfirmPaymentComman
                 TxId: cmd.TxId,
                 isPaid: false,
                 Status: bankStatus.Status,
-                PaidAmount: null,
-                PaidAt: null);
+                PaymentConfirmationTime: null);
 
 
         // valida se valor pago corresponde ao valor da fatura
@@ -86,14 +84,10 @@ public sealed class ConfirmPaymentHandler : IRequestHandler<ConfirmPaymentComman
         // registra auditoria
         await _auditRepository.AddAsync(Audit.Create(
             accountId: invoiceAudit.AccountId,
-            action: "Pagamento confirmado",
-            detail: $"TxId={cmd.TxId}, Valor={bankStatus.PaidAmount}",
+            payloads: $"Solicitação={cmd}, Valor={bankStatus.PaidAmount}",
             txId: cmd.TxId,
-            amount: invoiceAudit.Amount,
-            currency: "BRL",
             status: "Paid",
-            paidAmount: bankStatus.PaidAmount,
-            paidAt: bankStatus.PaidAt), ct);
+            paymentConfirmationTime: DateTime.Now), ct);
 
         // persiste no banco de dados
         await _unitOfWork.SaveChangesAsync(ct);
@@ -111,7 +105,6 @@ public sealed class ConfirmPaymentHandler : IRequestHandler<ConfirmPaymentComman
             TxId: cmd.TxId,
             isPaid: true,
             Status: "Paid",
-            PaidAmount: bankStatus.PaidAmount,
-            PaidAt: bankStatus.PaidAt);
+            PaymentConfirmationTime: DateTime.Now);
     }
 }
