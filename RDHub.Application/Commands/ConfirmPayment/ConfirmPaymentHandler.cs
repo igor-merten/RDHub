@@ -6,6 +6,7 @@ using RDHub.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 
 namespace RDHub.Application.Commands.ConfirmPayment;
 
@@ -34,8 +35,8 @@ public sealed class ConfirmPaymentHandler : IRequestHandler<ConfirmPaymentComman
 
     public async Task<ConfirmPaymentResult> Handle(ConfirmPaymentCommand cmd, CancellationToken ct)
     {
-        // busca na auditoria accoundId e bankId pelo txid
         var txId = TxId.From(cmd.TxId);
+        // busca na auditoria pelo txid
         var audits = await _auditRepository.GetByTxIdAsync(txId, ct);
 
         if (!audits.Any())
@@ -53,7 +54,7 @@ public sealed class ConfirmPaymentHandler : IRequestHandler<ConfirmPaymentComman
                 PaymentConfirmationTime: paidAudit.PaymentConfirmationTime);
         }
 
-        // busca a audit de Invoice criada para obter valor e AccountId
+        // busca primeira Auditoria criada com esse TxId
         var invoiceAudit = audits.FirstOrDefault(a => a.Status == "Open")
             ?? throw new Exception("Audit de invoice não encontrada");
 
@@ -64,6 +65,12 @@ public sealed class ConfirmPaymentHandler : IRequestHandler<ConfirmPaymentComman
         // consulta o status no banco (mockserver)
         var adapter = _adapterFactory.Get(account.BankId.ToString());
         var bankStatus = await adapter.GetChargeStatusAsync(cmd.TxId, ct);
+
+        var payloads = JsonSerializer.Serialize(new
+        {
+            request = new { txId = cmd.TxId },
+            response = bankStatus
+        });
 
         // se não está pago, retorna o status atual
         if (bankStatus.Status != "Paid")
@@ -84,10 +91,10 @@ public sealed class ConfirmPaymentHandler : IRequestHandler<ConfirmPaymentComman
         // registra auditoria
         await _auditRepository.AddAsync(Audit.Create(
             accountId: invoiceAudit.AccountId,
-            payloads: $"Solicitação={cmd}, Valor={bankStatus.PaidAmount}",
+            payloads: payloads,
             txId: cmd.TxId,
             status: "Paid",
-            paymentConfirmationTime: DateTime.Now), ct);
+            paymentConfirmationTime: DateTime.UtcNow), ct);
 
         // persiste no banco de dados
         await _unitOfWork.SaveChangesAsync(ct);
@@ -105,6 +112,6 @@ public sealed class ConfirmPaymentHandler : IRequestHandler<ConfirmPaymentComman
             TxId: cmd.TxId,
             isPaid: true,
             Status: "Paid",
-            PaymentConfirmationTime: DateTime.Now);
+            PaymentConfirmationTime: DateTime.UtcNow);
     }
 }

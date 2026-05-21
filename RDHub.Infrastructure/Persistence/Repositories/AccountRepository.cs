@@ -16,10 +16,16 @@ public class AccountRepository : IAccountRepository
 
     public async Task<Account?> GetByIdAsync(Guid id, CancellationToken ct = default)
 
-        => await _context.Accounts
-                .Include(a => a.Credential)
-                .Include(a => a.PixKeys)
-                .FirstOrDefaultAsync(a => a.Id == id && a.Active, ct);
+    => await _context.Accounts
+        .Include(a => a.Credential)
+        .Include(a => a.PixKeys)
+        .FirstOrDefaultAsync(a => a.Id == id && a.Active, ct);
+
+    public async Task<Account?> GetByPixKeyAsync(string pixKey, CancellationToken ct = default)
+    => await _context.Accounts
+        .Include(a => a.Credential)
+        .Include(a => a.PixKeys)
+        .FirstOrDefaultAsync(a => a.Active && a.PixKeys.Any(pk => pk.Key == pixKey), ct);
 
     public async Task AddAsync(Account account, CancellationToken ct = default)
         => await _context.Accounts.AddAsync(account, ct);

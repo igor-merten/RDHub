@@ -6,7 +6,13 @@ namespace RDHub.Application.DTOs;
 
 public sealed record BankChargeRequest(
     string TxId,
-    decimal Amount);
+    PixChargeType Type,
+    decimal Amount,
+    string PixKey,
+    DateOnly? DueDate = null,
+    int? ExpiresInSeconds = null,
+    string? PayerMessage = null
+    );
 
 public sealed record BankChargeResponse(
     string TxId,
@@ -18,3 +24,5 @@ public sealed record BankChargeStatusResponse(
     string Status,
     decimal? PaidAmount,
     DateTime? PaidAt);
+
+public enum PixChargeType { Cob, CobV }

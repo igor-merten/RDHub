@@ -4,11 +4,9 @@ namespace RDHub.Application.Commands.CreateCobv;
 
 public sealed record CreateCobvCommand(
     Guid InvoiceId,
-    string ChargeType,
     decimal Amount,
     string PixKey,
     DateOnly DueDate,
-    int ExpiresInSeconds,
     string PayerMessage) : IRequest<CreateCobvResult>;
 
 public sealed record CreateCobvResult(

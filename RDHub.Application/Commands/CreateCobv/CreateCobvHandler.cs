@@ -1,10 +1,13 @@
 using MediatR;
+using Microsoft.VisualBasic;
 using RDHub.Application.DTOs;
 using RDHub.Application.Interfaces;
 using RDHub.Domain.Aggregates;
+using RDHub.Domain.Exceptions;
 using RDHub.Domain.Repositories;
 using RDHub.Domain.ValueObjects;
 using System.Net.NetworkInformation;
+using System.Text.Json;
 
 namespace RDHub.Application.Commands.CreateCobv;
 
@@ -29,26 +32,41 @@ public sealed class CreateCobvHandler : IRequestHandler<CreateCobvCommand, Creat
 
     public async Task<CreateCobvResult> Handle(CreateCobvCommand cmd, CancellationToken ct)
     {
-        var account = await _accountRepository.GetByIdAsync(cmd.InvoiceId, ct)
-            ?? throw new Exception("Conta não encontrada");
+        var account = await _accountRepository.GetByPixKeyAsync(cmd.PixKey, ct)
+            ?? throw new DomainException("Conta não encontrada");
 
-        var invoice = Invoice.Create(Money.BRL(cmd.Amount), cmd.DueDate, account.BankId.ToString());
+        var invoice = Invoice.Create(cmd.InvoiceId, Money.BRL(cmd.Amount), cmd.DueDate);
 
         var txId = TxId.Generate();
 
         var adapter = _adapterFactory.Get(account.BankId.ToString());
 
-        var bankResponse = await adapter.CreateCobV(new BankChargeRequest(
+        // monta request
+        var bankRequest = new BankChargeRequest(
             TxId: txId.Value,
-            Amount: cmd.Amount), ct);
+            Type: PixChargeType.CobV,
+            Amount: cmd.Amount,
+            PixKey: cmd.PixKey,
+            DueDate: cmd.DueDate,
+            PayerMessage: cmd.PayerMessage);
+
+        // manda request e recebe response do banco
+        var bankResponse = await adapter.CreateCobV(bankRequest);
+
+        // monta payloads para auditoria
+        var payloads = JsonSerializer.Serialize(new
+        {
+            request = bankRequest,
+            response = bankResponse
+        });
 
         var pixCharge = PixCharge.Create(txId, invoice.Id, account.BankId.ToString(), bankResponse.Emv);
 
         invoice.AssignTxId(txId);
 
         await _auditRepository.AddAsync(Audit.Create(
-            accountId: cmd.InvoiceId,
-            payloads: $"Solicitação={cmd}",
+            accountId: account.Id,
+            payloads: payloads,
             txId: txId.Value,
             amount: cmd.Amount,
             status: invoice.Status.ToString()), ct);
