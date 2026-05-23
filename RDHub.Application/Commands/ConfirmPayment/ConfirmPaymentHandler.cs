@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using RDHub.Application.Interfaces;
 using RDHub.Domain.Aggregates;
 using RDHub.Domain.Repositories;
@@ -39,24 +39,8 @@ public sealed class ConfirmPaymentHandler : IRequestHandler<ConfirmPaymentComman
         // busca na auditoria pelo txid
         var audits = await _auditRepository.GetByTxIdAsync(txId, ct);
 
-        if (!audits.Any())
-            throw new KeyNotFoundException("Cobrança não encontrada");
-
-        // verifica se já está pago
-        var alreadyPaid = audits.Any(a => a.Status == "Paid");
-        if (alreadyPaid)
-        {
-            var paidAudit = audits.First(a => a.Status == "Paid");
-            return new ConfirmPaymentResult(
-                TxId: cmd.TxId,
-                isPaid: true,
-                Status: "Paid",
-                PaymentConfirmationTime: paidAudit.PaymentConfirmationTime);
-        }
-
-        // busca primeira Auditoria criada com esse TxId
-        var invoiceAudit = audits.FirstOrDefault(a => a.Status == "Open")
-            ?? throw new Exception("Audit de invoice não encontrada");
+        var invoiceAudit = audits.FirstOrDefault()
+            ?? throw new KeyNotFoundException("Cobrança não encontrada");
 
         // busca conta associada
         var account = await _accountRepository.GetByIdAsync(invoiceAudit.AccountId, ct)
@@ -89,12 +73,7 @@ public sealed class ConfirmPaymentHandler : IRequestHandler<ConfirmPaymentComman
         //}
 
         // registra auditoria
-        await _auditRepository.AddAsync(Audit.Create(
-            accountId: invoiceAudit.AccountId,
-            payloads: payloads,
-            txId: cmd.TxId,
-            status: "Paid",
-            paymentConfirmationTime: DateTime.UtcNow), ct);
+        invoiceAudit.MarkAsPaid(payloads);  
 
         // persiste no banco de dados
         await _unitOfWork.SaveChangesAsync(ct);
