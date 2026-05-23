@@ -1,4 +1,4 @@
-﻿using RDHub.Domain.Exceptions;
+using RDHub.Domain.Exceptions;
 using RDHub.Domain.ValueObjects;
 
 namespace RDHub.Domain.Aggregates;
@@ -40,5 +40,12 @@ public class Audit : AggregateRoot<Guid>
             PaymentConfirmationTime = paymentConfirmationTime,
             CreatedAt = DateTime.UtcNow
         };
+    }
+
+    public void MarkAsPaid(string payloads)
+    {
+        Status = "Paid";
+        Payloads = payloads;
+        PaymentConfirmationTime = DateTime.UtcNow;
     }
 }
