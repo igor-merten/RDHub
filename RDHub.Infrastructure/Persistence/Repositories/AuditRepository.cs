@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using RDHub.Domain.Aggregates;
 using RDHub.Domain.Repositories;
 using RDHub.Domain.ValueObjects;
@@ -26,7 +26,6 @@ public class AuditRepository : IAuditRepository
 
     public async Task<IEnumerable<Audit>> GetAllOpenAsync(CancellationToken ct = default)
     => await _context.Audits
-        .Where(a => a.Status == "Open"
-            && !_context.Audits.Any(p => p.TxId == a.TxId && p.Status == "Paid"))
+        .Where(a => a.Status == "Open")
         .ToListAsync(ct);
 }
