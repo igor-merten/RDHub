@@ -19,35 +19,17 @@ public sealed class GetChargeStatusHandler
         GetChargeStatusQuery query,
         CancellationToken ct)
     {
-        // Busca todas as auditorias pelo TxId
+
         var txId = TxId.From(query.TxId);
-        var audits = await _auditRepository.GetByTxIdAsync(txId, ct);
+        var audit = await _auditRepository.GetByTxIdAsync(txId, ct)
+            ?? throw new Exception("Auditoria não encontrada");
 
-        if (!audits.Any())
-            throw new KeyNotFoundException("Cobrança não encontrada");
-
-        // Verifica se existe alguma auditoria de pagamento confirmado
-        var paymentConfirmed = audits.FirstOrDefault(a => a.Status == "Paid");
-        if (paymentConfirmed is not null)
-        {
-            return new GetChargeStatusResult(
-                TxId: query.TxId,
-                Status: "Paid",
-                Amount: paymentConfirmed.Amount,
-                PaymentConfirmationTime: paymentConfirmed.PaymentConfirmationTime,
-                PaymentId: paymentConfirmed.Id,
-                Raw: "seila");
-        }
-
-        // Se não há pagamento confirmado, retorna como Open
-        var invoiceAudit = audits.FirstOrDefault(a => a.Status == "Open");
         return new GetChargeStatusResult(
             TxId: query.TxId,
-            Status: "Open",
-            Amount: null,
-            PaymentConfirmationTime: null,
-            PaymentId: null,
-            Raw: null
-        );
+            Status: audit.Status ?? string.Empty,
+            Amount: audit.Amount,
+            PaymentConfirmationTime: audit.PaymentConfirmationTime,
+            PaymentId: audit.Id,
+            Raw: "seila");
     }
 }

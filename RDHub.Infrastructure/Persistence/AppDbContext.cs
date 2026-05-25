@@ -11,6 +11,7 @@ public class AppDbContext : DbContext
     public DbSet<Credential> Credentials => Set<Credential>();
     public DbSet<PixKey> PixKeys => Set<PixKey>(); 
     public DbSet<Audit> Audits => Set<Audit>();
+    public DbSet<Message> Messages => Set<Message>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -57,12 +58,20 @@ public class AppDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.AccountId).IsRequired();
-            entity.Property(e => e.Payloads).IsRequired();
             entity.Property(e => e.CreatedAt).IsRequired();
             entity.Property(e => e.TxId);
             entity.Property(e => e.Amount);
             entity.Property(e => e.Status);
             entity.Property(e => e.PaymentConfirmationTime);
+        });
+
+        modelBuilder.Entity<Message>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.AuditoryId).IsRequired();
+            entity.Property(e => e.Description).IsRequired();
+            entity.Property(e => e.Type).IsRequired();
+            entity.Property(e => e.Body).IsRequired();
         });
     }
 }

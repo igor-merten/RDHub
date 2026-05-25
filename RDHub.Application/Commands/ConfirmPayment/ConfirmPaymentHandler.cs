@@ -17,6 +17,7 @@ public sealed class ConfirmPaymentHandler : IRequestHandler<ConfirmPaymentComman
     private readonly IBankAdapterFactory _adapterFactory;
     private readonly IMessageQueue _messageQueue;
     private readonly IAuditRepository _auditRepository;
+    private readonly IMessageRepository _messageRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public ConfirmPaymentHandler(
@@ -24,12 +25,14 @@ public sealed class ConfirmPaymentHandler : IRequestHandler<ConfirmPaymentComman
         IBankAdapterFactory adapterFactory,
         IMessageQueue messageQueue,
         IAuditRepository auditRepository,
+        IMessageRepository messageRepository,
         IUnitOfWork unitOfWork)
     {
         _accountRepository = accountRepository;
         _adapterFactory = adapterFactory;
         _messageQueue = messageQueue;
         _auditRepository = auditRepository;
+        _messageRepository = messageRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -37,13 +40,11 @@ public sealed class ConfirmPaymentHandler : IRequestHandler<ConfirmPaymentComman
     {
         var txId = TxId.From(cmd.TxId);
         // busca na auditoria pelo txid
-        var audits = await _auditRepository.GetByTxIdAsync(txId, ct);
-
-        var invoiceAudit = audits.FirstOrDefault()
-            ?? throw new KeyNotFoundException("Cobrança não encontrada");
+        var audit = await _auditRepository.GetByTxIdAsync(txId, ct)
+            ?? throw new Exception("Auditoria não encontrada");
 
         // busca conta associada
-        var account = await _accountRepository.GetByIdAsync(invoiceAudit.AccountId, ct)
+        var account = await _accountRepository.GetByIdAsync(audit.AccountId, ct)
             ?? throw new Exception("Conta não encontrada");
 
         // consulta o status no banco (mockserver)
@@ -73,7 +74,13 @@ public sealed class ConfirmPaymentHandler : IRequestHandler<ConfirmPaymentComman
         //}
 
         // registra auditoria
-        invoiceAudit.MarkAsPaid(payloads);  
+        audit.MarkAsPaid(payloads);
+
+        await _messageRepository.AddAsync(Message.Create(
+            auditoryId: audit.Id,
+            description: "Confirmação de pagamento",
+            type: "Response",
+            body: JsonSerializer.SerializeToElement(bankStatus)), ct);
 
         // persiste no banco de dados
         await _unitOfWork.SaveChangesAsync(ct);
@@ -82,7 +89,7 @@ public sealed class ConfirmPaymentHandler : IRequestHandler<ConfirmPaymentComman
         await _messageQueue.PublishAsync("payment-confirmed", new
         {
             TxId = cmd.TxId,
-            AccountId = invoiceAudit.AccountId,
+            AccountId = audit.AccountId,
             PaidAmount = bankStatus.PaidAmount,
             PaidAt = bankStatus.PaidAt
         }, ct);

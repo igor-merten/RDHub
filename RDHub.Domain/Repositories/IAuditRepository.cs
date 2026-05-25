@@ -10,7 +10,7 @@ namespace RDHub.Domain.Repositories;
 public interface IAuditRepository
 {
     Task AddAsync(Audit audit, CancellationToken ct = default); 
-    Task<IEnumerable<Audit>> GetByTxIdAsync(TxId txId, CancellationToken ct = default);
+    Task<Audit?> GetByTxIdAsync(TxId txId, CancellationToken ct = default);
     Task<IEnumerable<Audit>> GetByUserIdAsync(Guid userId, CancellationToken ct = default);
     Task<IEnumerable<Audit>> GetAllOpenAsync(CancellationToken ct = default);
 }

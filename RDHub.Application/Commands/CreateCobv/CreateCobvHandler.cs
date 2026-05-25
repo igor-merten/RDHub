@@ -16,17 +16,20 @@ public sealed class CreateCobvHandler : IRequestHandler<CreateCobvCommand, Creat
     private readonly IAccountRepository _accountRepository;
     private readonly IBankAdapterFactory _adapterFactory;
     private readonly IAuditRepository _auditRepository;
+    private readonly IMessageRepository _messageRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public CreateCobvHandler(
         IAccountRepository accountRepository,
         IBankAdapterFactory adapterFactory,
         IAuditRepository auditRepository,
+        IMessageRepository messageRepository,
         IUnitOfWork unitOfWork)
     {
         _accountRepository = accountRepository;
         _adapterFactory = adapterFactory;
         _auditRepository = auditRepository;
+        _messageRepository = messageRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -53,23 +56,32 @@ public sealed class CreateCobvHandler : IRequestHandler<CreateCobvCommand, Creat
         // manda request e recebe response do banco
         var bankResponse = await adapter.CreateCobV(bankRequest);
 
-        // monta payloads para auditoria
-        var payloads = JsonSerializer.Serialize(new
-        {
-            request = bankRequest,
-            response = bankResponse
-        });
-
         var pixCharge = PixCharge.Create(txId, invoice.Id, account.BankId.ToString(), bankResponse.Emv);
 
         invoice.AssignTxId(txId);
 
-        await _auditRepository.AddAsync(Audit.Create(
+        // cria auditoria
+        var audit = Audit.Create(
             accountId: account.Id,
-            payloads: payloads,
+            status: invoice.Status.ToString(),
             txId: txId.Value,
-            amount: cmd.Amount,
-            status: invoice.Status.ToString()), ct);
+            amount: cmd.Amount);
+
+        // salva auditoria
+        await _auditRepository.AddAsync(audit, ct);
+
+        await _messageRepository.AddAsync(Message.Create(
+            auditoryId: audit.Id,
+            description: "Solicitação de criação de cobrança",
+            type: "Request",
+            body: JsonSerializer.SerializeToElement(bankRequest)), ct);
+
+
+        await _messageRepository.AddAsync(Message.Create(
+            auditoryId: audit.Id,
+            description: "Solicitação de criação de cobrança",
+            type: "Response",
+            body: JsonSerializer.SerializeToElement(bankResponse)), ct);
 
         await _unitOfWork.SaveChangesAsync(ct);
 

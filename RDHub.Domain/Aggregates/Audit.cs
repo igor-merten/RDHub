@@ -7,10 +7,9 @@ namespace RDHub.Domain.Aggregates;
 public class Audit : AggregateRoot<Guid>
 {
     public Guid AccountId { get; private set; }
-    public string Payloads { get; private set; } = null!;
     public string? TxId { get; private set; }
     public decimal? Amount { get; private set; }
-    public string? Status { get; private set; }
+    public string Status { get; private set; } = string.Empty;
     public DateTime? PaymentConfirmationTime { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
@@ -18,25 +17,24 @@ public class Audit : AggregateRoot<Guid>
 
     public static Audit Create(
         Guid accountId,
-        string payloads,
+        string status,
         string? txId = null,
         decimal? amount = null,
-        string? status = null,
         DateTime? paymentConfirmationTime = null)
     {
         if (accountId == Guid.Empty)
             throw new DomainException("AccountId é obrigatório");
-        if (string.IsNullOrWhiteSpace(payloads))
-            throw new DomainException("Payload é obrigatório");
+        if (string.IsNullOrWhiteSpace(status))
+            throw new DomainException("Status é obrigatório");
+
 
         return new Audit
         {
             Id = Guid.NewGuid(),
             AccountId = accountId,
-            Payloads = payloads,
+            Status = status,
             TxId = txId,
             Amount = amount,
-            Status = status,
             PaymentConfirmationTime = paymentConfirmationTime,
             CreatedAt = DateTime.UtcNow
         };
@@ -45,7 +43,6 @@ public class Audit : AggregateRoot<Guid>
     public void MarkAsPaid(string payloads)
     {
         Status = "Paid";
-        Payloads = payloads;
         PaymentConfirmationTime = DateTime.UtcNow;
     }
 }
