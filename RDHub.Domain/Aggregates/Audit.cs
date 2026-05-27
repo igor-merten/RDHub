@@ -40,7 +40,7 @@ public class Audit : AggregateRoot<Guid>
         };
     }
 
-    public void MarkAsPaid(string payloads)
+    public void MarkAsPaid()
     {
         Status = "Paid";
         PaymentConfirmationTime = DateTime.UtcNow;

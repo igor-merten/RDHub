@@ -29,7 +29,6 @@ public sealed class GetChargeStatusHandler
             Status: audit.Status ?? string.Empty,
             Amount: audit.Amount,
             PaymentConfirmationTime: audit.PaymentConfirmationTime,
-            PaymentId: audit.Id,
-            Raw: "seila");
+            PaymentId: audit.Id);
     }
 }

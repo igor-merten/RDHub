@@ -54,7 +54,7 @@ public sealed class CreateCobvHandler : IRequestHandler<CreateCobvCommand, Creat
             PayerMessage: cmd.PayerMessage);
 
         // manda request e recebe response do banco
-        var bankResponse = await adapter.CreateCobV(bankRequest);
+        var bankResponse = await adapter.CreateCob(bankRequest, account.Credential, ct);
 
         var pixCharge = PixCharge.Create(txId, invoice.Id, account.BankId.ToString(), bankResponse.Emv);
 

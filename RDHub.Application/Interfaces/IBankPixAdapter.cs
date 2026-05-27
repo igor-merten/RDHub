@@ -1,4 +1,5 @@
 ﻿using RDHub.Application.DTOs;
+using RDHub.Domain.Aggregates;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,7 +10,7 @@ namespace RDHub.Application.Interfaces;
 public interface IBankPixAdapter
 {
     string BankId { get; }
-    Task<BankChargeResponse> CreateCob(BankChargeRequest request, CancellationToken ct = default);
-    Task<BankChargeResponse> CreateCobV(BankChargeRequest request, CancellationToken ct = default);
-    Task<BankChargeStatusResponse> GetChargeStatusAsync(string txId, CancellationToken ct = default);
+    Task<BankChargeResponse> CreateCob(BankChargeRequest request, Credential credential, CancellationToken ct = default);
+    Task<BankChargeResponse> CreateCobV(BankChargeRequest request, Credential credential, CancellationToken ct = default);
+    Task<BankChargeStatusResponse> GetChargeStatusAsync(string txId, Credential credential, CancellationToken ct = default);
 }

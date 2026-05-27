@@ -49,13 +49,7 @@ public sealed class ConfirmPaymentHandler : IRequestHandler<ConfirmPaymentComman
 
         // consulta o status no banco (mockserver)
         var adapter = _adapterFactory.Get(account.BankId.ToString());
-        var bankStatus = await adapter.GetChargeStatusAsync(cmd.TxId, ct);
-
-        var payloads = JsonSerializer.Serialize(new
-        {
-            request = new { txId = cmd.TxId },
-            response = bankStatus
-        });
+        var bankStatus = await adapter.GetChargeStatusAsync(cmd.TxId, account.Credential, ct);
 
         // se não está pago, retorna o status atual
         if (bankStatus.Status != "Paid")
@@ -74,7 +68,7 @@ public sealed class ConfirmPaymentHandler : IRequestHandler<ConfirmPaymentComman
         //}
 
         // registra auditoria
-        audit.MarkAsPaid(payloads);
+        audit.MarkAsPaid();
 
         await _messageRepository.AddAsync(Message.Create(
             auditoryId: audit.Id,

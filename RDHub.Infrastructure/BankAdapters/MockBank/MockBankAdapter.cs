@@ -1,40 +1,46 @@
 ﻿using RDHub.Application.DTOs;
 using RDHub.Application.Interfaces;
+using RDHub.Domain.Aggregates;
 using RDHub.Infrastructure.BankAdapters.Abstractions;
+using System.Net.Http.Json;
 using System.Text.Json;
 
-namespace RDHub.Infrastructure.BankAdapters;
+namespace RDHub.Infrastructure.BankAdapters.MockBank;
 
 // adapter que se comunica com o MockServer simulando um banco real
 public class MockBankAdapter : IBankPixAdapter
 {
     private readonly HttpClient _http;
-    private readonly string _bankId;
+    private readonly IMockBankTokenProvider _tokenProvider;
 
-    public MockBankAdapter(HttpClient http, string bankId)
+    public MockBankAdapter(HttpClient http, IMockBankTokenProvider tokenProvider, string bankId)
     {
         _http = http;
-        _bankId = bankId;
+        _tokenProvider = tokenProvider;
+        BankId = bankId;
     }
 
-    public string BankId => _bankId;
+    public string BankId { get; }
 
     public async Task<BankChargeResponse> CreateCob(
-        BankChargeRequest request,
+        BankChargeRequest request, 
+        Credential credential,
         CancellationToken ct = default)
     {
+        var token = await _tokenProvider.GetTokenAsync(_http, credential, ct);
+
         var payload = new
         {
             txId = request.TxId,
             amount = request.Amount
         };
 
-        var content = new StringContent(
-            JsonSerializer.Serialize(payload),
-            System.Text.Encoding.UTF8,
-            "application/json");
+        var httpRequest = new HttpRequestMessage(HttpMethod.Post, "/charge/cob");
+        httpRequest.Content = JsonContent.Create(payload);
 
-        var response = await _http.PostAsync("/charge/cob", content, ct);
+        httpRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+        var response = await _http.SendAsync(httpRequest, ct);
         response.EnsureSuccessStatusCode();
 
         var raw = await response.Content.ReadAsStringAsync(ct);
@@ -48,20 +54,23 @@ public class MockBankAdapter : IBankPixAdapter
 
     public async Task<BankChargeResponse> CreateCobV(
         BankChargeRequest request,
+        Credential credential,
         CancellationToken ct = default)
     {
+        var token = await _tokenProvider.GetTokenAsync(_http, credential, ct);
+
         var payload = new
         {
             txId = request.TxId,
             amount = request.Amount
         };
 
-        var content = new StringContent(
-            JsonSerializer.Serialize(payload),
-            System.Text.Encoding.UTF8,
-            "application/json");
+        var httpRequest = new HttpRequestMessage(HttpMethod.Post, "/charge/cobv");
+        httpRequest.Content = JsonContent.Create(payload);
 
-        var response = await _http.PostAsync("/charge/cobv", content, ct);
+        httpRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+        var response = await _http.SendAsync(httpRequest, ct);
         response.EnsureSuccessStatusCode();
 
         var raw = await response.Content.ReadAsStringAsync(ct);
@@ -74,10 +83,17 @@ public class MockBankAdapter : IBankPixAdapter
     }
 
     public async Task<BankChargeStatusResponse> GetChargeStatusAsync(
-        string txId,
+        string txId, 
+        Credential credential,
         CancellationToken ct = default)
     {
-        var response = await _http.GetAsync($"/pix/{txId}", ct);
+        string token = await _tokenProvider.GetTokenAsync(_http, credential, ct);
+
+        var httpRequest = new HttpRequestMessage(HttpMethod.Get, $"/pix/{txId}");
+
+        httpRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+        var response = await _http.SendAsync(httpRequest, ct);
         response.EnsureSuccessStatusCode();
 
         var raw = await response.Content.ReadAsStringAsync(ct);
