@@ -22,8 +22,8 @@ public class MockBankAdapter : IBankPixAdapter
 
     public string BankId { get; }
 
-    public async Task<BankChargeResponse> CreateCob(
-        BankChargeRequest request, 
+    public async Task<CobChargeResponseDto> CreateCob(
+        CobChargeRequestDto request, 
         Credential credential,
         CancellationToken ct = default)
     {
@@ -46,14 +46,14 @@ public class MockBankAdapter : IBankPixAdapter
         var raw = await response.Content.ReadAsStringAsync(ct);
         var result = JsonSerializer.Deserialize<JsonElement>(raw);
 
-        return new BankChargeResponse(
+        return new CobChargeResponseDto(
             TxId: request.TxId,
             Status: result.GetProperty("status").GetString() ?? "Open",
             Emv: result.GetProperty("emv").GetString() ?? string.Empty);
     }
 
-    public async Task<BankChargeResponse> CreateCobV(
-        BankChargeRequest request,
+    public async Task<CobvChargeResponseDto> CreateCobV(
+        CobvChargeRequestDto request,
         Credential credential,
         CancellationToken ct = default)
     {
@@ -76,13 +76,13 @@ public class MockBankAdapter : IBankPixAdapter
         var raw = await response.Content.ReadAsStringAsync(ct);
         var result = JsonSerializer.Deserialize<JsonElement>(raw);
 
-        return new BankChargeResponse(
+        return new CobvChargeResponseDto(
             TxId: request.TxId,
             Status: result.GetProperty("status").GetString() ?? "Open",
             Emv: result.GetProperty("emv").GetString() ?? string.Empty);
     }
 
-    public async Task<BankChargeStatusResponse> GetChargeStatusAsync(
+    public async Task<BankChargeStatusResponseDto> GetChargeStatusAsync(
         string txId, 
         Credential credential,
         CancellationToken ct = default)
@@ -109,7 +109,7 @@ public class MockBankAdapter : IBankPixAdapter
             paidAt = result.GetProperty("paidAt").GetDateTime();
         }
 
-        return new BankChargeStatusResponse(
+        return new BankChargeStatusResponseDto(
             TxId: txId,
             Status: status,
             PaidAmount: paidAmount,

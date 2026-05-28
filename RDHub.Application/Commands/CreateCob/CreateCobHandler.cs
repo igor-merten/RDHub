@@ -47,9 +47,8 @@ public sealed class CreateCobHandler : IRequestHandler<CreateCobCommand, CreateC
         var adapter = _adapterFactory.Get(account.BankId.ToString());
 
         // monta request
-        var bankRequest = new BankChargeRequest(
+        var bankRequest = new CobChargeRequestDto(
             TxId: txId.Value,
-            Type: PixChargeType.Cob,
             Amount: cmd.Amount,
             PixKey: cmd.PixKey,
             ExpiresInSeconds: cmd.ExpireInSeconds,

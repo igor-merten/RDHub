@@ -10,7 +10,7 @@ namespace RDHub.Application.Interfaces;
 public interface IBankPixAdapter
 {
     string BankId { get; }
-    Task<BankChargeResponse> CreateCob(BankChargeRequest request, Credential credential, CancellationToken ct = default);
-    Task<BankChargeResponse> CreateCobV(BankChargeRequest request, Credential credential, CancellationToken ct = default);
-    Task<BankChargeStatusResponse> GetChargeStatusAsync(string txId, Credential credential, CancellationToken ct = default);
+    Task<CobChargeResponseDto> CreateCob(CobChargeRequestDto request, Credential credential, CancellationToken ct = default);
+    Task<CobvChargeResponseDto> CreateCobV(CobvChargeRequestDto request, Credential credential, CancellationToken ct = default);
+    Task<BankChargeStatusResponseDto> GetChargeStatusAsync(string txId, Credential credential, CancellationToken ct = default);
 }
