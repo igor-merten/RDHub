@@ -17,6 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 // ====== CONTROLLERS ======
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddProblemDetails();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient("RecebDigital", client =>
     client.BaseAddress = new Uri(builder.Configuration["RecebaDigital:BaseUrl"]!));
