@@ -24,8 +24,10 @@ public sealed class CreateAccountHandler : IRequestHandler<CreateAccountCommand,
     public async Task<CreateAccountResult> Handle(CreateAccountCommand cmd, CancellationToken ct)
     {
         // valida se a credencial existe antes de criar a conta
-        var credential = await _credentialRepository.GetByIdAsync(cmd.CredentialId, ct)
-            ?? throw new KeyNotFoundException("Credencial não encontrada");
+        if (cmd.CredentialId is not null) { 
+            var credential = await _credentialRepository.GetByIdAsync(cmd.CredentialId.Value, ct)
+                ?? throw new KeyNotFoundException("Credencial não encontrada");
+        }
 
         var account = Account.Create(
             credentialId: cmd.CredentialId,

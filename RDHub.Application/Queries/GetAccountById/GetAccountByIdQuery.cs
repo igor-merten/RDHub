@@ -6,9 +6,9 @@ public sealed record GetAccountByIdQuery(Guid Id) : IRequest<GetAccountByIdResul
 
 public sealed record GetAccountByIdResult(
     Guid Id,
-    Guid CredentialId,
-    string Document,
+    Guid? CredentialId,
+    string? Document,
     int BankId,
-    string AccountNumber,
-    string Agency,
+    string? AccountNumber,
+    string? Agency,
     DateTime CreatedAt);

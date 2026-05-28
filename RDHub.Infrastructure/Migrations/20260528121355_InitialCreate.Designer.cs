@@ -13,7 +13,7 @@ using RDHub.Infrastructure.Persistence;
 namespace RDHub.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260525144138_InitialCreate")]
+    [Migration("20260528121355_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -51,7 +51,7 @@ namespace RDHub.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("CredentialId")
+                    b.Property<Guid?>("CredentialId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Document")
@@ -174,8 +174,7 @@ namespace RDHub.Infrastructure.Migrations
                     b.HasOne("RDHub.Domain.Aggregates.Credential", "Credential")
                         .WithMany()
                         .HasForeignKey("CredentialId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Credential");
                 });

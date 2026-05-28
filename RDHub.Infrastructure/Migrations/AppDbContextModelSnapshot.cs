@@ -48,7 +48,7 @@ namespace RDHub.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("CredentialId")
+                    b.Property<Guid?>("CredentialId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Document")
@@ -171,8 +171,7 @@ namespace RDHub.Infrastructure.Migrations
                     b.HasOne("RDHub.Domain.Aggregates.Credential", "Credential")
                         .WithMany()
                         .HasForeignKey("CredentialId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Credential");
                 });

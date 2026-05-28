@@ -42,7 +42,7 @@ public class AccountsController : ControllerBase
         [FromBody] UpdateAccountRequest request,
         CancellationToken ct)
     {
-        var command = new UpdateAccountCommand(id, request.Agency, request.AccountNumber, request.Document);
+        var command = new UpdateAccountCommand(id, request.CredentialId);
         var result = await _mediator.Send(command, ct);
         return Ok(result);
     }
@@ -58,4 +58,4 @@ public class AccountsController : ControllerBase
 }
 
 // DTO local para evitar que o Id venha no body do PUT
-public sealed record UpdateAccountRequest(string Agency, string AccountNumber, string Document);
+public sealed record UpdateAccountRequest(Guid? CredentialId);

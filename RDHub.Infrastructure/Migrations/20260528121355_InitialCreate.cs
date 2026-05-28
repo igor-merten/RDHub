@@ -64,7 +64,7 @@ namespace RDHub.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    CredentialId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CredentialId = table.Column<Guid>(type: "uuid", nullable: true),
                     BankId = table.Column<int>(type: "integer", nullable: false),
                     Agency = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
                     AccountNumber = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),

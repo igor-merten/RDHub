@@ -3,7 +3,7 @@
 namespace RDHub.Application.Commands.CreateAccount;
 
 public sealed record CreateAccountCommand(
-    Guid CredentialId,
+    Guid? CredentialId,
     string Document,
     int BankId,
     string AccountNumber,
@@ -11,9 +11,9 @@ public sealed record CreateAccountCommand(
 
 public sealed record CreateAccountResult(
     Guid Id,
-    Guid CredentialId,
-    string Document,
+    Guid? CredentialId,
+    string? Document,
     int BankId,
-    string AccountNumber,
-    string Agency,
+    string? AccountNumber,
+    string? Agency,
     DateTime CreatedAt);
