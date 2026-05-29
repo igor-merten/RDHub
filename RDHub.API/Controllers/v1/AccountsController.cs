@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Asp.Versioning;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using RDHub.API.Contracts.Accounts;
 using RDHub.Application.Commands.CreateAccount;
@@ -12,7 +13,8 @@ namespace RDHub.API.Controllers.v1;
 /// API para gerenciamento de contas.
 /// </summary>
 [ApiController]
-[Route("api/[controller]")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
 [Produces("application/json")]
 public class AccountsController : ControllerBase
 {

@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Asp.Versioning;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using RDHub.API.Contracts.Payments;
 using RDHub.Application.Commands.ConfirmPayment;
@@ -12,7 +13,8 @@ namespace RDHub.API.Controllers.v1;
 /// API para gerenciamento de cobranças Pix.
 /// </summary>
 [ApiController]
-[Route("api/[controller]")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
 [Produces("application/json")]
 public class PaymentController : ControllerBase
 {
@@ -28,7 +30,7 @@ public class PaymentController : ControllerBase
     /// <summary>
     /// Confirma manualmente o pagamento de uma cobrança.
     /// </summary>
-    [HttpPost("validate/v1/{txId}")]
+    [HttpPost("validate/{txId}")]
     [ProducesResponseType(typeof(ConfirmPaymentResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ConfirmPayment(
@@ -51,7 +53,7 @@ public class PaymentController : ControllerBase
     /// <summary>
     /// Consulta o status de uma cobrança.
     /// </summary>
-    [HttpGet("status/v1/{txId}")]
+    [HttpGet("status/{txId}")]
     [ProducesResponseType(typeof(GetChargeStatusResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetChargeStatus(
@@ -75,7 +77,7 @@ public class PaymentController : ControllerBase
     /// <summary>
     /// Cria uma cobrança Pix imediata (cob).
     /// </summary>
-    [HttpPost("charge/v1/cob")]
+    [HttpPost("charge/cob")]
     [ProducesResponseType(typeof(CreateCobResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status502BadGateway)]
@@ -109,7 +111,7 @@ public class PaymentController : ControllerBase
     /// <summary>
     /// Cria uma cobrança Pix com vencimento (cobv).
     /// </summary>
-    [HttpPost("charge/v1/cobv")]
+    [HttpPost("charge/cobv")]
     [ProducesResponseType(typeof(CreateCobvResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status502BadGateway)]

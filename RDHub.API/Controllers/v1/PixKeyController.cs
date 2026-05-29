@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Asp.Versioning;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using RDHub.API.Contracts.PixKeys;
 using RDHub.Application.Commands.CreatePixKey;
@@ -12,7 +13,8 @@ namespace RDHub.API.Controllers.v1;
 /// API para gerenciamento de chaves Pix.
 /// </summary>
 [ApiController]
-[Route("api/[controller]")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
 [Produces("application/json")]
 public class PixKeyController : ControllerBase
 {
@@ -117,7 +119,7 @@ public class PixKeyController : ControllerBase
     {
         _logger.LogInformation("Removendo chave Pix: Id={Id}", id);
 
-        await _mediator.Send(new DeletePixKeyCommand(id));
+        await _mediator.Send(new DeletePixKeyCommand(id), ct);
 
         return NoContent();
     }
