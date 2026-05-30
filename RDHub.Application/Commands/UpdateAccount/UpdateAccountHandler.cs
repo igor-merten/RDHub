@@ -20,7 +20,7 @@ public sealed class UpdateAccountHandler : IRequestHandler<UpdateAccountCommand,
         var account = await _accountRepository.GetByIdAsync(cmd.Id, ct)
             ?? throw new KeyNotFoundException("Conta não encontrada");
 
-        account.Update(cmd.CredentialId);
+        account.Update(cmd.CredentialId, cmd.Agency, cmd.AccountNumber, cmd.Document);
 
         await _accountRepository.UpdateAsync(account, ct);
         await _unitOfWork.SaveChangesAsync(ct);

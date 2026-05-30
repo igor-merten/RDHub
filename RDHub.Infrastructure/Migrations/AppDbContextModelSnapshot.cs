@@ -81,6 +81,9 @@ namespace RDHub.Infrastructure.Migrations
                     b.Property<DateTime?>("PaymentConfirmationTime")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid?>("PaymentId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text");

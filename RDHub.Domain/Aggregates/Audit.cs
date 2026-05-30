@@ -11,6 +11,7 @@ public class Audit : AggregateRoot<Guid>
     public decimal? Amount { get; private set; }
     public string Status { get; private set; } = string.Empty;
     public DateTime? PaymentConfirmationTime { get; private set; }
+    public Guid? PaymentId { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
     private Audit() { }
@@ -36,7 +37,8 @@ public class Audit : AggregateRoot<Guid>
             TxId = txId,
             Amount = amount,
             PaymentConfirmationTime = paymentConfirmationTime,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            PaymentId = null
         };
     }
 
@@ -44,5 +46,6 @@ public class Audit : AggregateRoot<Guid>
     {
         Status = "Paid";
         PaymentConfirmationTime = DateTime.UtcNow;
+        PaymentId = Guid.NewGuid();
     }
 }

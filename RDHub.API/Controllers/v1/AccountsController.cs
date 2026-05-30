@@ -105,7 +105,10 @@ public class AccountsController : ControllerBase
 
         var command = new UpdateAccountCommand(
             Id: id,
-            CredentialId: request.CredentialId);
+            CredentialId: request.CredentialId,
+            Agency: request.Agency,
+            AccountNumber: request.AccountNumber,
+            Document: request.Document);
 
         var result = await _mediator.Send(command, ct);
 

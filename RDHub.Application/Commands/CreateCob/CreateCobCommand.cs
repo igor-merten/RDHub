@@ -7,7 +7,7 @@ public sealed record CreateCobCommand(
     decimal Amount,
     string PixKey,
     int ExpireInSeconds,
-    string PayerMessage) : IRequest<CreateCobResult>;
+    string? PayerMessage) : IRequest<CreateCobResult>;
 
 public sealed record CreateCobResult(
     string TxId,

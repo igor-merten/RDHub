@@ -5,4 +5,4 @@ public sealed record CreateCobvRequest(
     decimal Amount,
     string PixKey,
     DateOnly DueDate,
-    string PayerMessage);
+    string? PayerMessage);

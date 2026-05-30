@@ -20,7 +20,6 @@ public class AppDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.ClientId).IsRequired();
             entity.Property(e => e.ClientSecret).IsRequired();
-            // Certificado e senha podem ser opcionais dependendo do banco
             entity.Property(e => e.Certificate);
             entity.Property(e => e.CertificatePassword);
         });
@@ -35,9 +34,8 @@ public class AppDbContext : DbContext
             entity.Property(e => e.CreatedAt).IsRequired();
             entity.Property(e => e.Active).IsRequired();
 
-            // Configuração da FK para Credential (1 Account -> 1 Credential)
             entity.HasOne(e => e.Credential)
-                  .WithMany() // Ou .WithOne() se for uma relação 1:1 estrita
+                  .WithMany()
                   .HasForeignKey(e => e.CredentialId)
                   .OnDelete(DeleteBehavior.Restrict);
         });
@@ -47,7 +45,6 @@ public class AppDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Key).IsRequired().HasMaxLength(100);
 
-            // Configuração da FK para Account (1 Account -> N PixKeys)
             entity.HasOne<Account>()
                   .WithMany(a => a.PixKeys)
                   .HasForeignKey(e => e.AccountId)
@@ -63,6 +60,7 @@ public class AppDbContext : DbContext
             entity.Property(e => e.Amount);
             entity.Property(e => e.Status);
             entity.Property(e => e.PaymentConfirmationTime);
+            entity.Property(e => e.PaymentId);
         });
 
         modelBuilder.Entity<Message>(entity =>

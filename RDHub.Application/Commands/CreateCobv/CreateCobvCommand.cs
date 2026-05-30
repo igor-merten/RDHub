@@ -7,7 +7,7 @@ public sealed record CreateCobvCommand(
     decimal Amount,
     string PixKey,
     DateOnly DueDate,
-    string PayerMessage) : IRequest<CreateCobvResult>;
+    string? PayerMessage) : IRequest<CreateCobvResult>;
 
 public sealed record CreateCobvResult(
     string TxId,

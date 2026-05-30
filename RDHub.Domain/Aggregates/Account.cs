@@ -52,9 +52,12 @@ public class Account : AggregateRoot<Guid>
         };
     }
 
-    public void Update(Guid? credentialId)
+    public void Update(Guid? credentialId, string? agency, string? accountNumber, string? document)
     {
         CredentialId = credentialId;
+        Agency = agency ?? Agency;
+        AccountNumber = accountNumber ?? AccountNumber;
+        Document = document ?? Document;
     }
 
     public void Deactivate()

@@ -5,4 +5,4 @@ public sealed record CreateCobRequest(
     decimal Amount,
     string PixKey,
     int ExpireInSeconds,
-    string PayerMessage);
+    string? PayerMessage);

@@ -22,6 +22,7 @@ namespace RDHub.Infrastructure.Migrations
                     Amount = table.Column<decimal>(type: "numeric", nullable: true),
                     Status = table.Column<string>(type: "text", nullable: false),
                     PaymentConfirmationTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    PaymentId = table.Column<Guid>(type: "uuid", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
