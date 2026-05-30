@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using RDHub.Domain.Repositories;
 using RDHub.Domain.ValueObjects;
+using System.Text.Json;
 
 namespace RDHub.Application.Queries.GetChargeStatus;
 
@@ -9,10 +10,12 @@ public sealed class GetChargeStatusHandler
     : IRequestHandler<GetChargeStatusQuery, GetChargeStatusResult>
 {
     private readonly IAuditRepository _auditRepository;
+    private readonly IMessageRepository _messageRepository;
 
-    public GetChargeStatusHandler(IAuditRepository auditRepository)
+    public GetChargeStatusHandler(IAuditRepository auditRepository, IMessageRepository messageRepository)
     {
         _auditRepository = auditRepository;
+        _messageRepository = messageRepository;
     }
 
     public async Task<GetChargeStatusResult> Handle(
@@ -24,11 +27,20 @@ public sealed class GetChargeStatusHandler
         var audit = await _auditRepository.GetByTxIdAsync(txId, ct)
             ?? throw new Exception("Auditoria não encontrada");
 
+        var messages = await _messageRepository.GetAllByAuditoryIdAsync(audit.Id, ct);
+
+        var raw = messages.Select(m => new
+        {
+            Type = m.Type,
+            Body = m.Body
+        });
+
         return new GetChargeStatusResult(
             TxId: query.TxId,
             Status: audit.Status ?? string.Empty,
             Amount: audit.Amount,
-            PaymentConfirmationTime: audit.PaymentConfirmationTime,
-            PaymentId: audit.PaymentId);
+            PaidAt: audit.PaymentConfirmationTime,
+            PaymentId: audit.PaymentId,
+            Raw: raw);
     }
 }

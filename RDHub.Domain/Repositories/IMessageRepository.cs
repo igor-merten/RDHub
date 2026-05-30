@@ -8,5 +8,5 @@ namespace RDHub.Domain.Repositories;
 public interface IMessageRepository
 {
     Task AddAsync(Message message, CancellationToken ct = default);
-    Task<Message?> GetAllByAuditoryIdAsync(Guid auditoryId, CancellationToken ct = default);
+    Task<List<Message>> GetAllByAuditoryIdAsync(Guid auditoryId, CancellationToken ct = default);
 }

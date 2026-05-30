@@ -10,5 +10,6 @@ public sealed record GetChargeStatusResult(
     string TxId,
     string Status,
     decimal? Amount,
-    DateTime? PaymentConfirmationTime,
-    Guid? PaymentId);
+    DateTime? PaidAt,
+    Guid? PaymentId,
+    object Raw);

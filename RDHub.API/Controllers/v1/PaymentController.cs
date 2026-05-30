@@ -6,6 +6,7 @@ using RDHub.Application.Commands.ConfirmPayment;
 using RDHub.Application.Commands.CreateCob;
 using RDHub.Application.Commands.CreateCobv;
 using RDHub.Application.Queries.GetChargeStatus;
+using System.Security.AccessControl;
 
 namespace RDHub.API.Controllers.v1;
 
@@ -68,8 +69,9 @@ public class PaymentController : ControllerBase
             TxId: result.TxId,
             Status: result.Status,
             Amount: result.Amount,
-            PaymentConfirmationTime: result.PaymentConfirmationTime,
-            PaymentId: result.PaymentId);
+            PaidAt: result.PaidAt,
+            PaymentId: result.PaymentId,
+            Raw: result.Raw);
 
         return Ok(response);
     }

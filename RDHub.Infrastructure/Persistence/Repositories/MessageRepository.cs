@@ -16,9 +16,12 @@ public class MessageRepository : IMessageRepository
         _context = context;
     }
 
-    public async Task<Message?> GetAllByAuditoryIdAsync(Guid auditoryId, CancellationToken ct = default)
+    public async Task<List<Message>> GetAllByAuditoryIdAsync(Guid auditoryId, CancellationToken ct = default)
     {
-        return await _context.Messages.FirstOrDefaultAsync(m => m.AuditoryId == auditoryId, ct);
+        return await _context.Messages
+        .Where(m => m.AuditoryId == auditoryId)
+        .OrderBy(m => m.AuditoryId) // garante a ordem request → response → ...
+        .ToListAsync(ct); ;
     }
 
     public async Task AddAsync(Message message, CancellationToken ct = default)

@@ -55,7 +55,7 @@ public static class DependencyInjection
                 configuration["RabbitMQ:Password"]!));
 
         // ====== BACKGROUND SERVICES ======
-        services.AddHostedService<PaymentConsumerService>();
+        //services.AddHostedService<PaymentConsumerService>();
         services.AddHostedService<PaymentSchedulerService>();
 
         return services;
