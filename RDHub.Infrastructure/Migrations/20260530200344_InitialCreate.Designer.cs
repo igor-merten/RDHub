@@ -13,7 +13,7 @@ using RDHub.Infrastructure.Persistence;
 namespace RDHub.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260530185423_InitialCreate")]
+    [Migration("20260530200344_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
