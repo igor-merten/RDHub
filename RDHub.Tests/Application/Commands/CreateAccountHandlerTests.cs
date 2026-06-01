@@ -87,7 +87,7 @@ public class CreateAccountHandlerTests
             .Returns(Task.CompletedTask);
 
         _mockUnitOfWork.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(1);
+            .Returns(Task.CompletedTask);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
