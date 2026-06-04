@@ -67,4 +67,12 @@ public class Account : AggregateRoot<Guid>
 
         Active = false;
     }
+
+    public void Activate()
+    {
+        if (Active)
+            throw new DomainException("Conta já está ativa");
+
+        Active = true;
+    }
 }

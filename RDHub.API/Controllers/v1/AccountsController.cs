@@ -2,8 +2,10 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using RDHub.API.Contracts.Accounts;
+using RDHub.API.DTOs.Accounts;
 using RDHub.Application.Commands.CreateAccount;
-using RDHub.Application.Commands.DeleteAccount;
+using RDHub.Application.Commands.DisableAccount;
+using RDHub.Application.Commands.EnableAccount;
 using RDHub.Application.Commands.UpdateAccount;
 using RDHub.Application.Queries.GetAccountById;
 
@@ -120,18 +122,35 @@ public class AccountsController : ControllerBase
     }
 
     /// <summary>
-    /// Remove uma conta.
+    /// Desativa uma conta.
     /// </summary>
-    [HttpDelete("{id:guid}")]
+    [HttpPost("disable")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteAccount(
-        [FromRoute] Guid id,
+    public async Task<IActionResult> DisableAccount(
+        [FromBody] DisableAccountRequest request,
         CancellationToken ct)
     {
-        _logger.LogInformation("Removendo conta: Id={Id}", id);
+        _logger.LogInformation("Desabilitando conta: Id={Id}", request.Id);
 
-        await _mediator.Send(new DeleteAccountCommand(id), ct);
+        await _mediator.Send(new DisableAccountCommand(request.Id), ct);
+
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Ativa uma conta.
+    /// </summary>
+    [HttpPost("enable")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> EnableAccount(
+        [FromBody] EnableAccountRequest request,
+        CancellationToken ct)
+    {
+        _logger.LogInformation("Habilitando conta: Id={Id}", request.Id);
+
+        await _mediator.Send(new EnableAccountCommand(request.Id), ct);
 
         return NoContent();
     }

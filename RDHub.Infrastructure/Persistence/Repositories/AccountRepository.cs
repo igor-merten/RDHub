@@ -21,6 +21,13 @@ public class AccountRepository : IAccountRepository
         .Include(a => a.PixKeys)
         .FirstOrDefaultAsync(a => a.Id == id && a.Active, ct);
 
+    public async Task<Account?> GetActiveAndInactiveByIdAsync(Guid id, CancellationToken ct = default)
+
+    => await _context.Accounts
+        .Include(a => a.Credential)
+        .Include(a => a.PixKeys)
+        .FirstOrDefaultAsync(a => a.Id == id, ct);
+
     public async Task<Account?> GetByPixKeyAsync(string pixKey, CancellationToken ct = default)
     => await _context.Accounts
         .Include(a => a.Credential)
@@ -33,9 +40,15 @@ public class AccountRepository : IAccountRepository
     public async Task UpdateAsync(Account account, CancellationToken ct = default)
         => _context.Accounts.Update(account);
 
-    public async Task DeleteAsync(Account account, CancellationToken ct = default)
+    public async Task DisableAsync(Account account, CancellationToken ct = default)
     {
         account.Deactivate();
+        _context.Accounts.Update(account);
+    }
+
+    public async Task EnableAsync(Account account, CancellationToken ct = default)
+    {
+        account.Activate();
         _context.Accounts.Update(account);
     }
 }
