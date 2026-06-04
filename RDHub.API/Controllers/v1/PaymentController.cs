@@ -31,16 +31,16 @@ public class PaymentController : ControllerBase
     /// <summary>
     /// Confirma manualmente o pagamento de uma cobrança.
     /// </summary>
-    [HttpPost("webhook/{txId}")]
+    [HttpPost("webhook")]
     [ProducesResponseType(typeof(ConfirmPaymentResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ConfirmPayment(
-        [FromRoute] string txId,
+        [FromBody] ConfirmPaymentRequest request,
         CancellationToken ct)
     {
-        _logger.LogInformation("Confirmando pagamento: TxId={TxId}", txId);
+        _logger.LogInformation("Confirmando pagamento: TxId={TxId}", request.TxId);
 
-        var result = await _mediator.Send(new ConfirmPaymentCommand(txId), ct);
+        var result = await _mediator.Send(new ConfirmPaymentCommand(request.TxId, request.Status, request.PaidAmount), ct);
 
         var response = new ConfirmPaymentResponse(
             TxId: result.TxId,

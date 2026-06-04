@@ -61,7 +61,7 @@ public class PaymentSchedulerService : BackgroundService
             // Se o branco responder que foi pago, dispara o command para dar baixa no sistema
             if (result.Status == "Paid")
             {
-                await mediator.Send(new ConfirmPaymentCommand(audit.TxId!), ct);
+                await mediator.Send(new ConfirmPaymentCommand(audit.TxId!, audit.Status, audit.Amount), ct);
                 _logger.LogInformation("Cobrança {TxId} confirmada.", audit.TxId);
             }
         }

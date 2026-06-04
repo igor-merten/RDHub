@@ -39,6 +39,7 @@ public sealed class ConfirmPaymentHandler : IRequestHandler<ConfirmPaymentComman
     public async Task<ConfirmPaymentResult> Handle(ConfirmPaymentCommand cmd, CancellationToken ct)
     {
         var txId = TxId.From(cmd.TxId);
+
         // busca na auditoria pelo txid
         var audit = await _auditRepository.GetByTxIdAsync(txId, ct)
             ?? throw new Exception("Auditoria não encontrada");
@@ -47,25 +48,22 @@ public sealed class ConfirmPaymentHandler : IRequestHandler<ConfirmPaymentComman
         var account = await _accountRepository.GetByIdAsync(audit.AccountId, ct)
             ?? throw new Exception("Conta não encontrada");
 
-        // consulta o status no banco (mockserver)
-        var adapter = _adapterFactory.Get(account.BankId.ToString());
-        var bankStatus = await adapter.GetChargeStatusAsync(cmd.TxId, account.Credential, ct);
+        //// consulta o status no banco (mockserver)
+        //var adapter = _adapterFactory.Get(account.BankId.ToString());
+        //var bankStatus = await adapter.GetChargeStatusAsync(cmd.TxId, account.Credential, ct);
 
         // se não está pago, retorna o status atual
-        if (bankStatus.Status != "Paid")
+        if (cmd.Status != "Paid")
             return new ConfirmPaymentResult(
                 TxId: cmd.TxId,
                 isPaid: false,
-                Status: bankStatus.Status,
+                Status: cmd.Status,
                 PaymentConfirmationTime: null);
 
 
         // valida se valor pago corresponde ao valor da fatura
-        //if (invoiceAudit.Amount.HasValue && bankStatus.PaidAmount.HasValue)
-        //{
-        //    if (Math.Abs(bankStatus.PaidAmount.Value - invoiceAudit.Amount.Value) > 0.01m)
-        //        throw new Exception($"Valor pago {bankStatus.PaidAmount} diverge do valor da fatura {invoiceAudit.Amount}");
-        //}
+        if (Math.Abs(cmd.PaidAmount - audit.Amount) > 0.01m)
+            throw new Exception($"Valor pago {cmd.PaidAmount} diverge do valor da fatura {audit.Amount}");
 
         // registra auditoria
         audit.MarkAsPaid();
@@ -74,7 +72,7 @@ public sealed class ConfirmPaymentHandler : IRequestHandler<ConfirmPaymentComman
             auditoryId: audit.Id,
             description: "Confirmação de pagamento",
             type: "Response",
-            body: JsonSerializer.SerializeToElement(bankStatus)), ct);
+            body: JsonSerializer.SerializeToElement(cmd)), ct);
 
         // persiste no banco de dados
         await _unitOfWork.SaveChangesAsync(ct);
@@ -84,8 +82,8 @@ public sealed class ConfirmPaymentHandler : IRequestHandler<ConfirmPaymentComman
         {
             TxId = cmd.TxId,
             AccountId = audit.AccountId,
-            PaidAmount = bankStatus.PaidAmount,
-            PaidAt = bankStatus.PaidAt
+            PaidAmount = cmd.PaidAmount,
+            PaymentConfirmationTime = DateTime.UtcNow
         }, ct);
 
         return new ConfirmPaymentResult(
