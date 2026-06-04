@@ -15,7 +15,7 @@ namespace RDHub.API.Controllers.v1;
 /// </summary>
 [ApiController]
 [ApiVersion("1.0")]
-[Route("api/v{version:apiVersion}/pix-charges")]
+[Route("api/v{version:apiVersion}/")]
 [Produces("application/json")]
 public class PaymentController : ControllerBase
 {
@@ -31,7 +31,7 @@ public class PaymentController : ControllerBase
     /// <summary>
     /// Confirma manualmente o pagamento de uma cobrança.
     /// </summary>
-    [HttpPost("validate/{txId}")]
+    [HttpPost("webhook/{txId}")]
     [ProducesResponseType(typeof(ConfirmPaymentResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ConfirmPayment(
