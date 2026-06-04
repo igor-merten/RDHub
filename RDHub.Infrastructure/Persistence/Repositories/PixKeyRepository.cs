@@ -29,9 +29,6 @@ public class PixKeyRepository : IPixKeyRepository
     public async Task AddAsync(PixKey pixKey, CancellationToken ct = default)
         => await _context.PixKeys.AddAsync(pixKey, ct);
 
-    public async Task UpdateAsync(PixKey pixKey, CancellationToken ct = default)
-        => _context.PixKeys.Update(pixKey);
-
     public async Task DeleteAsync(PixKey pixKey, CancellationToken ct = default)
         => _context.PixKeys.Remove(pixKey);
 }

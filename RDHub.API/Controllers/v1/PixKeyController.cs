@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using RDHub.API.Contracts.PixKeys;
 using RDHub.Application.Commands.CreatePixKey;
 using RDHub.Application.Commands.DeletePixKey;
-using RDHub.Application.Commands.UpdatePixKey;
 using RDHub.Application.Queries.GetPixKeyById;
 
 namespace RDHub.API.Controllers.v1;
@@ -71,35 +70,6 @@ public class PixKeyController : ControllerBase
         var result = await _mediator.Send(new GetPixKeyByIdQuery(id), ct);
 
         var response = new GetPixKeyByIdResponse(
-            Id: result.Id,
-            Key: result.Key,
-            AccountId: result.AccountId);
-
-        return Ok(response);
-    }
-
-    /// <summary>
-    /// Atualiza uma chave Pix existente.
-    /// </summary>
-    [HttpPut("{id:guid}")]
-    [ProducesResponseType(typeof(UpdatePixKeyResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdatePixKey(
-        [FromRoute] Guid id,
-        [FromBody] UpdatePixKeyRequest request,
-        CancellationToken ct)
-    {
-        _logger.LogInformation("Atualizando chave Pix: Id={Id}", id);
-
-        var command = new UpdatePixKeyCommand(
-            Id: id,
-            Key: request.Key,
-            AccountId: request.AccountId);
-
-        var result = await _mediator.Send(command, ct);
-
-        var response = new UpdatePixKeyResponse(
             Id: result.Id,
             Key: result.Key,
             AccountId: result.AccountId);

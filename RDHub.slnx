@@ -3,4 +3,5 @@
   <Project Path="RDHub.Application/RDHub.Application.csproj" />
   <Project Path="RDHub.Domain/RDHub.Domain.csproj" />
   <Project Path="RDHub.Infrastructure/RDHub.Infrastructure.csproj" />
+  <Project Path="RDHub.Tests/RDHub.Tests.csproj" />
 </Solution>
