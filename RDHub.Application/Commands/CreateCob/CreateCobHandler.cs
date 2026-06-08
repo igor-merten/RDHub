@@ -57,10 +57,6 @@ public sealed class CreateCobHandler : IRequestHandler<CreateCobCommand, CreateC
         // manda request e recebe response do banco
         var bankResponse = await adapter.CreateCob(bankRequest, account.Credential, ct);
 
-        // cria cobrança pix com os dados do banco
-        // ver utilidade disso, já que o status da cobrança é controlado pelo banco e não pela aplicação
-        var pixCharge = PixCharge.Create(txId, invoice.Id, account.BankId.ToString(), bankResponse.Emv);
-
         // associa txId com invoice
         invoice.AssignTxId(txId);
 
